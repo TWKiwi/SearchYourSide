@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical"
+
+    android:background="#ffcc">
+    <!--android:background="@drawable/menu_bag"-->
+
+
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:background="#2828FF"
+        android:id="@+id/PostView"/>
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:textSize="35sp"
+        android:textColor="#2828FF"
+        android:background="#46A3FF"
+        android:gravity="center"
+        android:id="@+id/lazyChargeBtn"
+        android:text="@string/activity_main懶人記帳"/>
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:textSize="35sp"
+        android:textColor="#2828FF"
+        android:background="#2894FF"
+        android:gravity="center"
+        android:id="@+id/smartButlerBtn"
+        android:text="@string/activity_main智能管家" />
+
+
+
+</LinearLayout>

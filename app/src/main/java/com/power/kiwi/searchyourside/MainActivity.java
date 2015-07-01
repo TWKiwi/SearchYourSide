@@ -1,0 +1,81 @@
+package com.power.kiwi.searchyourside;
+
+import android.content.Intent;
+import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+
+/**
+ * 懶人記帳與智能管家選擇畫面*/
+public class MainActivity extends ActionBarActivity implements View.OnClickListener{
+
+    /**
+     * 懶人記帳按鈕與智能管家按鈕*/
+    Button lazyChargeBtn,smartButlerBtn;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        initView();
+        setListener();
+
+    }
+    /**
+     * 載入View物件*/
+    private void initView(){
+        lazyChargeBtn = (Button)findViewById(R.id.lazyChargeBtn);
+        smartButlerBtn = (Button)findViewById(R.id.smartButlerBtn);
+    }
+    /**
+     * 設置View物件監聽*/
+    private void setListener(){
+        lazyChargeBtn.setOnClickListener(this);
+        smartButlerBtn.setOnClickListener(this);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View v) {
+        Intent intent;
+
+        switch(v.getId()){
+            case R.id.lazyChargeBtn :
+
+                intent = new Intent(this,LazyChargeActivity.class);
+                startActivity(intent);
+                break;
+
+            case R.id.smartButlerBtn :
+
+                intent = new Intent(this,SmartButlerActivity.class);
+                startActivity(intent);
+                break;
+        }
+    }
+}
