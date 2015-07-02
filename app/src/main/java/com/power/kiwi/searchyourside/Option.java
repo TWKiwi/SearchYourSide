@@ -20,8 +20,8 @@ public class Option {
 
     /**
      * 儲存個人化的整數設定
-     * key 字串
-     * value 儲存得值(int)*/
+     * @param key 字串
+     * @param value 儲存得值(int)*/
     protected void setInt(String key,int value){
 
         SharedPreferences.Editor editor = optionSpr.edit();
@@ -31,8 +31,8 @@ public class Option {
     }
     /**
      * 儲存個人化的整數設定
-     * key 字串
-     * value 儲存得值(Double轉String儲存)*/
+     * @param key 字串
+     * @param value 儲存得值(Double轉String儲存)*/
     protected void setDouble(String key,double value){
 
         SharedPreferences.Editor editor = optionSpr.edit();
@@ -42,8 +42,8 @@ public class Option {
     }
     /**
      * 儲存個人化的整數設定
-     * key 字串
-     * value 儲存得值(String)*/
+     * @param key 字串
+     * @param value 儲存得值(String)*/
     protected void setString(String key,String value){
 
         SharedPreferences.Editor editor = optionSpr.edit();
@@ -54,7 +54,7 @@ public class Option {
 
     /**
      * 取得個人化設定整數值
-     * key 字串*/
+     * @param key 字串*/
     public int getInt(String key){
 
 //        // NumberFormat 數字格式
@@ -71,7 +71,7 @@ public class Option {
 
     /**
      * 取得個人化設定整數值，取至小數點第2位
-     * key 字串*/
+     * @param key 字串*/
     public Double getDouble(String key){
 
 //        // NumberFormat 數字格式
@@ -92,7 +92,7 @@ public class Option {
 
     /**
      * 取得個人化設定字串
-     * key 字串*/
+     * @param key 字串*/
     public String getString(String key){
 
         return optionSpr.getString(key, "null");

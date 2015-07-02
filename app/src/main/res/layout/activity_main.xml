@@ -22,7 +22,7 @@
         android:background="#46A3FF"
         android:gravity="center"
         android:id="@+id/lazyChargeBtn"
-        android:text="@string/activity_main懶人記帳"/>
+        android:text="@string/lazyChargerBtn"/>
 
     <Button
         android:layout_width="fill_parent"
@@ -33,7 +33,7 @@
         android:background="#2894FF"
         android:gravity="center"
         android:id="@+id/smartButlerBtn"
-        android:text="@string/activity_main智能管家" />
+        android:text="@string/smartBulterBtn" />
 
 
 

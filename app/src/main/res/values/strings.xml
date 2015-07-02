@@ -1,8 +1,11 @@
 <resources>
     <string name="app_name">SearchYourSide</string>
 
-    <string name="activity_main懶人記帳">懶人記帳</string>
-    <string name="activity_main智能管家">智能管家</string>
+    <string name="lazyChargerBtn">懶人記帳</string>
+    <string name="smartBulterBtn">智能管家</string>
+    <string name="takePicAndCharge">拍照記帳</string>
+    <string name="calendarSearch">月曆查詢</string>
+    <string name="barChartView">各類開銷</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_lazy_charge">LazyChargeActivity</string>
 
