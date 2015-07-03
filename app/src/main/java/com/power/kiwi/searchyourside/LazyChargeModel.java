@@ -65,6 +65,10 @@ public class LazyChargeModel extends Observable {
 
     }
 
+    /**
+     * Cursor在資料庫中的游標的意思
+     * @param activity 呼叫用
+     * */
     public Cursor getCursor(Activity activity){
 
         SQLiteDatabase db = mLazyChargeDB.getReadableDatabase();
