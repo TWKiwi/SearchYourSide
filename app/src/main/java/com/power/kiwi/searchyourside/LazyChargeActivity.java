@@ -11,14 +11,14 @@ import java.util.Observer;
 
 public class LazyChargeActivity extends ActionBarActivity implements Observer{
 
-    private LazyChargeDB mLazyChargeDB = new LazyChargeDB();
+    private LazyChargeModel mLazyChargeModel = new LazyChargeModel();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lazy_charge);
 
-        mLazyChargeDB.addObserver(this);
+        mLazyChargeModel.addObserver(this);
     }
 
 
@@ -47,7 +47,7 @@ public class LazyChargeActivity extends ActionBarActivity implements Observer{
     @Override
     public void onDestroy(){
 
-        mLazyChargeDB.deleteObserver(this);
+        mLazyChargeModel.deleteObserver(this);
 
     }
 
