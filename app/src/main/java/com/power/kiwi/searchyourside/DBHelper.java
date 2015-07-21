@@ -1,7 +1,7 @@
 package com.power.kiwi.searchyourside;
 
 import static com.power.kiwi.searchyourside.DbConstants.TABLE_NAME;
-import static com.power.kiwi.searchyourside.DbConstants.PHNAME;
+import static com.power.kiwi.searchyourside.DbConstants.PICNAME;
 import static com.power.kiwi.searchyourside.DbConstants.NAME;
 import static com.power.kiwi.searchyourside.DbConstants.TYPE;
 import static com.power.kiwi.searchyourside.DbConstants.PRICE;
@@ -24,9 +24,10 @@ public class DBHelper extends SQLiteOpenHelper  {
     /**
      * @param DATABASE_VERSION 資料庫版本
      * */
-    private final static int DATABASE_VERSION = 0;//資料庫版本每次有修改都要+1
+    private final static int DATABASE_VERSION = 1;//資料庫版本每次有修改都要+1
 
     /**
+     * 建構子
      * */
     public DBHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -36,10 +37,10 @@ public class DBHelper extends SQLiteOpenHelper  {
     public void onCreate(SQLiteDatabase db) {
         final String INIT_TABLE = "CREATE TABLE " + TABLE_NAME +
                 " (" +_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                PHNAME + " CHAR, " +
+                PICNAME + " CHAR, " +
                 NAME + " CHAR, " +
                 TYPE + " CHAR, " +
-                PRICE + " CHAR);";
+                PRICE + " INTEGER);";
         db.execSQL(INIT_TABLE);
     }
 
