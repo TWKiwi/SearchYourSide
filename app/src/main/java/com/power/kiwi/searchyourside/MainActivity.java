@@ -13,7 +13,8 @@ import android.widget.Button;
 public class MainActivity extends ActionBarActivity implements View.OnClickListener{
 
     /**
-     * 懶人記帳按鈕與智能管家按鈕*/
+     * 懶人記帳按鈕與智能管家按鈕
+     * */
     Button lazyChargeBtn,smartButlerBtn;
 
     @Override
@@ -26,13 +27,15 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     }
     /**
-     * 載入View物件*/
+     * 載入View物件
+     * */
     private void initView(){
         lazyChargeBtn = (Button)findViewById(R.id.lazyChargeBtn);
         smartButlerBtn = (Button)findViewById(R.id.smartButlerBtn);
     }
     /**
-     * 設置View物件監聽*/
+     * 設置View物件監聽
+     * */
     private void setListener(){
         lazyChargeBtn.setOnClickListener(this);
         smartButlerBtn.setOnClickListener(this);
