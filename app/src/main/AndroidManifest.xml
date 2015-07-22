@@ -9,7 +9,9 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -18,11 +20,15 @@
         </activity>
         <activity
             android:name=".LazyChargeActivity"
-            android:label="@string/title_activity_lazy_charge" >
+            android:label="@string/title_activity_lazy_charge"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:windowSoftInputMode="stateHidden" >
         </activity>
         <activity
             android:name=".SmartButlerActivity"
-            android:label="@string/title_activity_smart_butler" >
+            android:label="@string/title_activity_smart_butler"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:windowSoftInputMode="stateHidden" >
         </activity>
     </application>
 
