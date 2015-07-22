@@ -1,42 +1,36 @@
 package com.power.kiwi.searchyourside;
 
-import static com.power.kiwi.searchyourside.DbConstants.TABLE_NAME;
-import static com.power.kiwi.searchyourside.DbConstants.PICNAME;
-import static com.power.kiwi.searchyourside.DbConstants.NAME;
-import static com.power.kiwi.searchyourside.DbConstants.TYPE;
-import static com.power.kiwi.searchyourside.DbConstants.PRICE;
-
 import android.app.Activity;
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import java.util.Observable;
-
-import static android.provider.BaseColumns._ID;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by kiwi on 15/7/2.
+ * 作為LazyChargeActivity背後的支援者，盡可能扮演好MVC架構中的Model角色
  */
 public class LazyChargeModel extends Fragment implements View.OnClickListener {
 
-    LazyChargeActivity mlazyChargeActivity;
-    private Button mtakePicBtn, maddBtn;
+    private LazyChargeActivity mLazyChargeActivity;//透過他存取LazyChargeActivity資源
+    private Button mTakePicBtn, mAddBtn;//拍照按鈕與入帳按鈕
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-        mlazyChargeActivity = (LazyChargeActivity) activity;
+        mLazyChargeActivity = (LazyChargeActivity) activity;
     }
 
     @Override
@@ -49,23 +43,32 @@ public class LazyChargeModel extends Fragment implements View.OnClickListener {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mtakePicBtn = (Button) this.getView().findViewById(R.id.takePicBtn);
-        maddBtn = (Button) this.getView().findViewById(R.id.addDataBtn);
+        mTakePicBtn = (Button) this.getView().findViewById(R.id.takePicBtn);
+        mAddBtn = (Button) this.getView().findViewById(R.id.addDataBtn);
 
         setListener();
     }
-
+    /**
+     * 設置監聽器
+     * */
     private void setListener() {
 
-        mtakePicBtn.setOnClickListener(this);
-        maddBtn.setOnClickListener(this);
+        mTakePicBtn.setOnClickListener(this);
+        mAddBtn.setOnClickListener(this);
     }
 
+    private String mPicName = "null";//作為當下image圖檔名稱
+    private File mDirFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+ "/" + "RecordPic");//指定儲存路徑
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.takePicBtn:
                 Toast.makeText(this.getView().getContext(), "拍照", Toast.LENGTH_LONG).show();
+                mPicName = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".jpg";
+                Uri imgUri = Uri.parse("file://" + mDirFile + mPicName);
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imgUri);
+                startActivityForResult(cameraIntent,0);
                 break;
             case R.id.addDataBtn:
                 Toast.makeText(this.getView().getContext(), "儲存", Toast.LENGTH_LONG).show();

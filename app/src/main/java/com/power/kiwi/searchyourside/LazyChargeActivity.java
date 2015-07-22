@@ -21,12 +21,12 @@ import static com.power.kiwi.searchyourside.DbConstants.PRICE;
 import static com.power.kiwi.searchyourside.DbConstants.TABLE_NAME;
 import static com.power.kiwi.searchyourside.DbConstants.TYPE;
 
-
+/**
+ * 懶人記帳功能的Activity，將以分頁呈現拍照記帳,月曆查詢,圖表畫面以上三分支功能，盡可能扮演好MVC架構中的Controller角色
+ * */
 public class LazyChargeActivity extends FragmentActivity implements View.OnClickListener{
 
     private DBHelper mSQLiteDB = null;//資料庫物件
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,30 +37,28 @@ public class LazyChargeActivity extends FragmentActivity implements View.OnClick
         initView();
 
     }
-
+    /**
+     * 建立分頁畫面
+     * */
     private void initView(){
 
+        FragmentTabHost tabHost = (FragmentTabHost)findViewById(R.id.tabHost);
+        tabHost.setup(this, getSupportFragmentManager(), android.R.id.tabcontent);
 
-
-        FragmentTabHost TabHost = (FragmentTabHost)findViewById(R.id.tabHost);
-        TabHost.setup(this, getSupportFragmentManager(), android.R.id.tabcontent);
-
-        TabHost.addTab(TabHost.newTabSpec("懶人記帳")
+        tabHost.addTab(tabHost.newTabSpec("懶人記帳")
                                             .setIndicator("懶人記帳"),
                                             LazyChargeModel.class,
                                             null);
-        TabHost.addTab(TabHost.newTabSpec("月曆查詢")
+        tabHost.addTab(tabHost.newTabSpec("月曆查詢")
                                             .setIndicator("月曆查詢"),
                                             CaleadarSearchModel.class,
                                             null);
-        TabHost.addTab(TabHost.newTabSpec("圖表查詢")
+        tabHost.addTab(tabHost.newTabSpec("圖表查詢")
                                             .setIndicator("圖表查詢"),
                                             BarChartViewModel.class,
                                             null);
 
     }
-
-
 
     /**
      * 建立資料庫
