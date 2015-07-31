@@ -3,12 +3,14 @@ package com.power.kiwi.searchyourside;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,9 +26,10 @@ import static com.power.kiwi.searchyourside.DbConstants.TYPE;
 /**
  * 懶人記帳功能的Activity，將以分頁呈現拍照記帳,月曆查詢,圖表畫面以上三分支功能，盡可能扮演好MVC架構中的Controller角色
  * */
-public class LazyChargeActivity extends FragmentActivity implements View.OnClickListener{
+public class LazyChargeActivity extends FragmentActivity{
 
     private DBHelper mSQLiteDB = null;//資料庫物件
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +60,24 @@ public class LazyChargeActivity extends FragmentActivity implements View.OnClick
                                             .setIndicator("圖表查詢"),
                                             BarChartViewModel.class,
                                             null);
+    }
+
+    /**
+     * @param requestCode 回傳參數
+     * @param resultCode 判別按下是確定或取消
+     * @param data 照片資料
+     * */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode,resultCode,data);
+
+        Log.d("進入onActivityResult","onActivityResult");
+        if (resultCode == RESULT_OK) {
+            Log.d("進入onActivityResult","resultCode == RESULT_OK");
+            new LazyChargeModel().showImage();
+        }else{
+            Log.d("進入onActivityResult","else");
+        }
 
     }
 
@@ -143,15 +164,4 @@ public class LazyChargeActivity extends FragmentActivity implements View.OnClick
         closeDatabase();
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.takePicBtn :
-                Toast.makeText(this,"拍照",Toast.LENGTH_LONG).show();
-                break;
-            case R.id.addDataBtn :
-                Toast.makeText(this,"儲存",Toast.LENGTH_LONG).show();
-                break;
-        }
-    }
 }
