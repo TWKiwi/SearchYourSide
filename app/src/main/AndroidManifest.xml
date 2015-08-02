@@ -3,6 +3,8 @@
     package="com.power.kiwi.searchyourside" >
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
 
     <application
@@ -24,7 +26,7 @@
         <activity
             android:name=".LazyChargeActivity"
             android:label="@string/title_activity_lazy_charge"
-            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:theme="@android:style/Theme.Holo.Light.DarkActionBar">
             android:windowSoftInputMode="stateHidden" >
         </activity>
         <activity

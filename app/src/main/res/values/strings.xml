@@ -27,8 +27,8 @@
 
 
     <string name="action_settings">Settings</string>
-    <string name="title_activity_lazy_charge">LazyChargeActivity</string>
+    <string name="title_activity_lazy_charge">懶人記帳</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="title_activity_smart_butler">SmartButlerActivity</string>
+    <string name="title_activity_smart_butler">智能管家</string>
 </resources>

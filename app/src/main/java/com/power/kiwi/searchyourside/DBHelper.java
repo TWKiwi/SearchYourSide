@@ -24,7 +24,7 @@ public class DBHelper extends SQLiteOpenHelper  {
     /**
      * @param DATABASE_VERSION 資料庫版本
      * */
-    private final static int DATABASE_VERSION = 1;//資料庫版本每次有修改都要+1
+    private final static int DATABASE_VERSION = 2;//資料庫版本每次有修改都要+1
 
     /**
      * 建構子
@@ -40,7 +40,7 @@ public class DBHelper extends SQLiteOpenHelper  {
                 PICNAME + " CHAR, " +
                 NAME + " CHAR, " +
                 TYPE + " CHAR, " +
-                PRICE + " INTEGER);";
+                PRICE + " CHAR);";
         db.execSQL(INIT_TABLE);
     }
 
