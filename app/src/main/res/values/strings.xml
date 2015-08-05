@@ -10,13 +10,15 @@
     <string name="ItemNameTxt">商品\n名稱</string>
     <string name="ItemTypeTxt">商品\n類別</string>
     <string-array name="Consumer_types">
-        <item>食</item>
-        <item>衣</item>
-        <item>住</item>
-        <item>行</item>
-        <item>育</item>
-        <item>樂</item>
-        <item>醫療</item>
+        <item>飯</item>
+        <item>粥</item>
+        <item>麵</item>
+        <item>油炸</item>
+        <item>中式</item>
+        <item>西式</item>
+        <item>點心</item>
+        <item>冰飲</item>
+        <item>其他</item>
     </string-array>
     <string name="ItemPrice">商品\n價格</string>
 

@@ -26,10 +26,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
@@ -38,6 +42,7 @@ import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import static android.provider.BaseColumns._ID;
@@ -50,15 +55,16 @@ import static com.power.kiwi.searchyourside.DbConstants.TYPE;
 /**
  * 懶人記帳功能的Activity，將以分頁呈現拍照記帳,月曆查詢,圖表畫面以上三分支功能，盡可能扮演好MVC架構中的Controller角色
  * */
-public class LazyChargeActivity extends FragmentActivity implements ActionBar.TabListener{
+public class LazyChargeActivity extends FragmentActivity implements ActionBar.TabListener {
 
-    private DBHelper mSQLiteDB = null;//資料庫物件
+    public static DBHelper mSQLiteDB = null;//資料庫物件
 
     private AppSectionsPagerAdapter mAppSectionsPagerAdapter;//畫面適配器
 
     private ViewPager mViewPager;//畫面
 
     public static List<String> mPageTittle;//畫面標題
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,10 +74,11 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
         initView();
 
     }
+
     /**
      * 建立分頁畫面
-     * */
-    private void initView(){
+     */
+    private void initView() {
 
         //設定三個頁面標題
         mPageTittle = new ArrayList<>();
@@ -125,12 +132,12 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
     }
 
 
-
     /**
      * 建立資料庫
+     *
      * @param context 整個系統環境
-     * */
-    protected void openDatabase(Context context){
+     */
+    protected void openDatabase(Context context) {
 
         mSQLiteDB = new DBHelper(context);
 
@@ -138,8 +145,8 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
 
     /**
      * 關閉資料庫
-     * */
-    protected void closeDatabase(){
+     */
+    protected void closeDatabase() {
 
         mSQLiteDB.close();
 
@@ -147,34 +154,34 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
 
     /**
      * 加入資料庫
-     * @param picName 圖片名稱，命名格式為年月日時分秒，也是辨別用名稱
+     *
+     * @param picName      圖片名稱，命名格式為年月日時分秒，也是辨別用名稱
      * @param chargeRecord 入帳名稱，可不填
-     * @param chargeType 類別名稱，食衣住行育樂醫療
-     * @param chargePrice 金額
-     * */
-    protected void addDb(String picName,String chargeRecord,String chargeType, String chargePrice){
+     * @param chargeType   類別名稱，食衣住行育樂醫療
+     * @param chargePrice  金額
+     */
+    protected void addDb(String picName, String chargeRecord, String chargeType, String chargePrice) {
 
         SQLiteDatabase db = mSQLiteDB.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(PICNAME, picName.trim());
-        values.put(NAME,chargeRecord.trim());
-        values.put(TYPE,chargeType.trim());
-        values.put(PRICE,chargePrice.trim());
-        db.insert(TABLE_NAME,null,values);
+        values.put(NAME, chargeRecord.trim());
+        values.put(TYPE, chargeType.trim());
+        values.put(PRICE, chargePrice.trim());
+        db.insert(TABLE_NAME, null, values);
 
     }
 
     /**
      * Cursor在資料庫中的游標的意思
-     * @param activity 呼叫用
-     * */
-    public Cursor getCursor(Activity activity){
+     */
+    public Cursor getCursor() {
 
         SQLiteDatabase db = mSQLiteDB.getReadableDatabase();
-        String[] colums = {_ID,PICNAME,NAME,TYPE,PRICE};
+        String[] colums = {_ID, PICNAME, NAME, TYPE, PRICE};
 
-        Cursor cursor = db.query(TABLE_NAME,colums,null,null,null,null,null);
-        activity.startManagingCursor(cursor);
+        Cursor cursor = db.query(TABLE_NAME, colums, null, null, null, null, null);
+        startManagingCursor(cursor);
 
         return cursor;
     }
@@ -203,7 +210,7 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
 
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         closeDatabase();
     }
@@ -237,10 +244,10 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
         @Override
         public Fragment getItem(int i) {
             switch (i) {
-                case 0 :
+                case 0:
                     return new CameraView();
-                case 1 :
-                    return new CalendarView();
+                case 1:
+                    return new CalendarSearchView();
                 default:
                     return new BarChartView();
             }
@@ -260,29 +267,28 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
     /**
      * 初始化拍照記帳畫面
      */
-    public static class CameraView extends Fragment implements View.OnClickListener{
+    public static class CameraView extends Fragment implements View.OnClickListener {
         private View mRootView;
         private Button mTakePicBtn, mAddBtn;//拍照按鈕與入帳按鈕
         private ImageView mImageView;
-        private LazyChargeActivity mLazyChargeActivity;
+        private LazyChargeActivity mLazyChargeActivity = new LazyChargeActivity();
         private EditText mItemName, mItemPrice;
         private Spinner mItemType;
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             mRootView = inflater.inflate(R.layout.camera_view, container, false);
+
+            initView();
+
             //如果資料夾不存在
-            if(!mDirFile.exists()){
+            if (!mDirFile.exists()) {
                 //建立資料夾
                 mDirFile.mkdirs();
 
             }
-            mTakePicBtn = (Button) mRootView.findViewById(R.id.takePicBtn);
-            mAddBtn = (Button) mRootView.findViewById(R.id.addDataBtn);
-            mImageView = (ImageView) mRootView.findViewById(R.id.PicImageView);
-            mItemName = (EditText) mRootView.findViewById(R.id.ItemName);
-            mItemType = (Spinner) mRootView.findViewById(R.id.ItemType);
-            mItemPrice = (EditText) mRootView.findViewById(R.id.ItemPrice);
+
 //            // Demonstration of a collection-browsing activity.
 //            mRootView.findViewById(R.id.takePicBtn)
 //                    .setOnClickListener(new View.OnClickListener() {
@@ -314,8 +320,20 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
         }
 
         /**
+         * 初始化View物件
+         */
+        private void initView() {
+            mTakePicBtn = (Button) mRootView.findViewById(R.id.takePicBtn);
+            mAddBtn = (Button) mRootView.findViewById(R.id.addDataBtn);
+            mImageView = (ImageView) mRootView.findViewById(R.id.PicImageView);
+            mItemName = (EditText) mRootView.findViewById(R.id.ItemName);
+            mItemType = (Spinner) mRootView.findViewById(R.id.ItemType);
+            mItemPrice = (EditText) mRootView.findViewById(R.id.ItemPrice);
+        }
+
+        /**
          * 設置監聽器
-         * */
+         */
         private void setListener() {
 
             mTakePicBtn.setOnClickListener(this);
@@ -324,19 +342,19 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
 
         /**
          * 作為當下image圖檔名稱
-         * */
+         */
         private String mPicName = "null";
 
         /**
          * 指定儲存路徑
-         * */
+         */
         private File mDirFile =
                 new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) +
                         "/" + "RecordPic");
 
         /**
          * 圖檔路徑
-         * */
+         */
         private Uri imgUri;
 
         @Override
@@ -352,11 +370,12 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
                     break;
                 case R.id.addDataBtn:
                     Toast.makeText(this.getView().getContext(), "儲存", Toast.LENGTH_LONG).show();
-                    if(mPicName.equals("null")) mPicName = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".jpg";
-                    mLazyChargeActivity.addDb(mPicName.trim(),
-                            mItemName.getText().toString().trim(),
-                            mItemType.getSelectedItem().toString().trim(),
-                            mItemPrice.getText().toString().trim());
+                    if (mPicName.equals("null")) mPicName =
+                            new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".jpg";
+                    mLazyChargeActivity.addDb(mPicName,
+                            mItemName.getText().toString(),
+                            mItemType.getSelectedItem().toString(),
+                            mItemPrice.getText().toString());
                     mImageView.setImageDrawable(null);
                     mPicName = "null";
                     mItemName.setText("");
@@ -367,29 +386,29 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
 
         /**
          * @param requestCode 回傳參數
-         * @param resultCode 判別按下是確定或取消
-         * @param data 照片資料
-         * */
+         * @param resultCode  判別按下是確定或取消
+         * @param data        照片資料
+         */
         @Override
-        public void onActivityResult(int requestCode, int resultCode, Intent data){
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
             super.onActivityResult(requestCode, resultCode, data);
 
-            Log.d("進入onActivityResult","onActivityResult");
+            Log.d("進入onActivityResult", "onActivityResult");
             if (resultCode == RESULT_OK) {
-                Log.d("進入onActivityResult","resultCode == RESULT_OK");
+                Log.d("進入onActivityResult", "resultCode == RESULT_OK");
                 showImage();
-            }else{
-                Log.d("進入onActivityResult","else");
+            } else {
+                Log.d("進入onActivityResult", "else");
             }
 
         }
 
         /**
          * 顯示圖片，換算照片與圖片畫面的大小比例做調整，預防一次載入過大資料流造成系統崩潰
-         * */
-        public void showImage(){
+         */
+        public void showImage() {
 
-            int PicW,PicH,ImgViewW,ImgViewH;
+            int PicW, PicH, ImgViewW, ImgViewH;
 
 
             BitmapFactory.Options options = new BitmapFactory.Options();
@@ -401,7 +420,7 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
             ImgViewW = mImageView.getWidth();
             ImgViewH = mImageView.getHeight();
 
-            int scaleFactor = Math.min(PicW/ImgViewW , PicH/ImgViewH);
+            int scaleFactor = Math.min(PicW / ImgViewW, PicH / ImgViewH);
             options.inJustDecodeBounds = false;
             options.inSampleSize = scaleFactor;
             options.inPurgeable = true;
@@ -416,10 +435,11 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
 
         /**
          * 圖片壓縮方法，每次壓縮成原本大小的90%，直到小於100kb
-         * @param bmp 點陣圖資料流
+         *
+         * @param bmp       點陣圖資料流
          * @param imagePath 圖檔路徑
-         * */
-        private void compressImageByQuality(final Bitmap bmp, final String imagePath){
+         */
+        private void compressImageByQuality(final Bitmap bmp, final String imagePath) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -434,11 +454,11 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
                         //每次調整壓縮量，減至0則壓至最小
                         options -= 10;
                         //如果成立，則將圖片質量壓縮到最小值
-                        if(options < 10)options = 0;
+                        if (options < 10) options = 0;
                         //將壓縮後的圖片保存至byteArrayOutputStream中
                         bmp.compress(Bitmap.CompressFormat.JPEG, options, byteArrayOutputStream);
                         //如果成立，不再進行壓縮
-                        if(options == 0)break;
+                        if (options == 0) break;
                     }
                     try {
                         //將壓縮後的圖片保存至指定路徑中
@@ -459,15 +479,174 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
     /**
      * 初始化日曆畫面
      */
-    public static class CalendarView extends Fragment {
+    public static class CalendarSearchView extends Fragment implements CalendarView.OnDateChangeListener {
+
+        private LazyChargeActivity mLazyChargeActivity = new LazyChargeActivity();
+
+
+        private View rootView;
+        private CalendarView mCalendarView;
+        private ListView mListView;
+
+        private Long mDate;
+        private List<HashMap<String, Object>> mItemList;
+        /**
+         * 指定儲存路徑
+         */
+        private File mDirFile =
+                new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) +
+                        "/" + "RecordPic");
+
+        /**
+         * 圖檔路徑
+         */
+        private Uri imgUri;
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.calendar_view, container, false);
+            rootView = inflater.inflate(R.layout.calendar_view, container, false);
 
-
+            initView();
+            Log.d("Text","onCreateView");
             return rootView;
+        }
+
+        /**
+         * 初始化View元件
+         */
+        private void initView() {
+            mCalendarView = (CalendarView) rootView.findViewById(R.id.CalendarView);
+            mDate = mCalendarView.getDate();
+            mCalendarView.setOnDateChangeListener(this);
+
+            mListView = (ListView) rootView.findViewById(R.id.listView);
+            mItemList = getData(new SimpleDateFormat("yyyyMMdd").format(new Date()));
+            mListView.setAdapter(mAdapter);
+            Log.d("Text","initView");
+
+        }
+
+        @Override
+        public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
+
+            //避免翻月時誤觸監聽器
+            if (mCalendarView.getDate() != mDate) {
+                mDate = mCalendarView.getDate();
+
+                String DATE = String.valueOf(year) +
+                        String.valueOf(month+1) +
+                        String.valueOf(dayOfMonth);
+
+                mItemList = getData(String.valueOf(DATE));
+                mListView.setAdapter(mAdapter);
+                Log.d("Text","onSelectDayChange");
+            }
+        }
+
+        private List<HashMap<String, Object>> getData(String DATE) {
+            //新建一個集合類，用於存放多條數據，Map的key是一個String類型，Map的value是Object類型
+            ArrayList<HashMap<String, Object>> list = new ArrayList<>();
+
+
+            Cursor cursor = mLazyChargeActivity.getCursor();
+
+            while (cursor.moveToNext()) {
+
+                if (DATE.equals(cursor.getString(1).substring(0, 8))) {
+
+                    //依前面的路徑及檔案名建立Uri物件
+                    imgUri = Uri.parse("file://" + mDirFile + "/" + cursor.getString(1));
+                    //讀取圖檔內容轉換為Bitmap物件
+                    Bitmap bmp = BitmapFactory.decodeFile(imgUri.getPath());
+                    HashMap<String, Object> item = new HashMap<>();
+
+                    int id = cursor.getInt(0);
+                    String picname = cursor.getString(1);
+                    String name = cursor.getString(2);
+                    String type = cursor.getString(3);
+                    String price = cursor.getString(4);
+
+                    StringBuilder itemData = new StringBuilder();
+                    itemData.append("品名：").append(name).append("\n");
+                    itemData.append("類型：").append(type).append("\n");
+                    itemData.append("價錢：").append(price).append("元\n");
+
+                    item.put("itemImageView", bmp);
+                    item.put("itemData", itemData);
+                    item.put("id", id);
+                    item.put("picName", picname);
+                    list.add(item);
+
+                    Log.d("Text","DATE.equals(cursor.getString(1).substring(0, 8))");
+                }
+                Log.d("Text","cursor.moveToNext()" + DATE);
+            }
+            Log.d("Text","getData");
+            return list;
+        }
+
+        private MyAdapter mAdapter = new MyAdapter();
+
+        public class MyAdapter extends BaseAdapter {
+            private LayoutInflater mInflater;
+
+            public MyAdapter(Context context) {
+                this.mInflater = LayoutInflater.from(context);
+            }
+
+            @Override
+            public int getCount() {
+                return mItemList.size();
+            }
+
+            @Override
+            public Object getItem(int position) {
+                return null;
+            }
+
+            @Override
+            public long getItemId(int position) {
+                return 0;
+            }
+
+            @Override
+            public View getView(final int position, View convertView, ViewGroup parent) {
+
+                if (convertView == null)
+                    convertView = mInflater.inflate(R.layout.list_view_object, null);
+
+                final ImageView itemImageView = (ImageView) convertView.findViewById(R.id.ChargeListImg);
+                itemImageView.setImageBitmap((Bitmap) mItemList.get(position).get("itemImageView"));
+                TextView itemView = (TextView) convertView.findViewById(R.id.ChargeListTxt);
+                itemView.setText(mItemList.get(position).get("itemData").toString());
+                Button deleteBtn = (Button) convertView.findViewById(R.id.DeleteBtn);
+                final String id = mItemList.get(position).get("id").toString();
+                final String picName = mItemList.get(position).get("picName").toString();
+                deleteBtn.setTag(position);
+                deleteBtn.setOnClickListener(new Button.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+//                    try{
+                        mItemList.remove(position);
+                        notifyDataSetChanged();
+                        SQLiteDatabase db = mSQLiteDB.getWritableDatabase();
+                        db.delete(TABLE_NAME, _ID + "=" + id, null);
+                        mListView.setAdapter(mAdapter);
+
+
+//                  }catch (Exception e){
+//                      Toast.makeText(DateListActivity.this,"當日沒有紀錄",Toast.LENGTH_LONG).show();
+                        /**以下刪除功能在android 4.4以上版本不適用*/
+                        File f = new File(String.valueOf(mDirFile + "/" + picName));
+                        f.delete();
+//                    }
+                    }
+                });
+                return convertView;
+            }
+
         }
 
     }
@@ -487,4 +666,5 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
         }
 
     }
+
 }
