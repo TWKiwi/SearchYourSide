@@ -19,6 +19,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -479,10 +480,10 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
     /**
      * 初始化日曆畫面
      */
-    public static class CalendarSearchView extends Fragment implements CalendarView.OnDateChangeListener {
+    public static class CalendarSearchView extends ListFragment implements CalendarView.OnDateChangeListener {
 
         private LazyChargeActivity mLazyChargeActivity = new LazyChargeActivity();
-
+        private MyAdapter mAdapter;
 
         private View rootView;
         private CalendarView mCalendarView;
@@ -522,6 +523,7 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
 
             mListView = (ListView) rootView.findViewById(R.id.listView);
             mItemList = getData(new SimpleDateFormat("yyyyMMdd").format(new Date()));
+            mAdapter = new MyAdapter(getActivity());
             mListView.setAdapter(mAdapter);
             Log.d("Text","initView");
 
@@ -530,15 +532,24 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
         @Override
         public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
 
+            String Year = String.valueOf(year);
+            String Month = String.valueOf(month);
+            String Day = String.valueOf(dayOfMonth);
             //避免翻月時誤觸監聽器
             if (mCalendarView.getDate() != mDate) {
                 mDate = mCalendarView.getDate();
+                //月份在這裡是從0算起故加1代表正確月份
+                month += 1;
+                if(year < 1000) Year = "0" + String.valueOf(year);
 
-                String DATE = String.valueOf(year) +
-                        String.valueOf(month+1) +
-                        String.valueOf(dayOfMonth);
+                if (month < 10) Month = "0" + String.valueOf(month);
+
+                if (dayOfMonth < 10) Day = "0" + String.valueOf(dayOfMonth);
+
+                String DATE = Year + Month + Day;
 
                 mItemList = getData(String.valueOf(DATE));
+                mAdapter = new MyAdapter(getActivity());
                 mListView.setAdapter(mAdapter);
                 Log.d("Text","onSelectDayChange");
             }
@@ -586,12 +597,13 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
             return list;
         }
 
-        private MyAdapter mAdapter = new MyAdapter();
+
 
         public class MyAdapter extends BaseAdapter {
+
             private LayoutInflater mInflater;
 
-            public MyAdapter(Context context) {
+            public MyAdapter(Context context){
                 this.mInflater = LayoutInflater.from(context);
             }
 
