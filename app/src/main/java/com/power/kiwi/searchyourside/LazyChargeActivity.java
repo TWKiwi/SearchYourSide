@@ -66,6 +66,8 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
 
     public static List<String> mPageTittle;//畫面標題
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -238,12 +240,17 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
      */
     public static class AppSectionsPagerAdapter extends FragmentPagerAdapter {
 
+        FragmentManager fm;
+
         public AppSectionsPagerAdapter(FragmentManager fm) {
             super(fm);
+            this.fm = fm;
+            Log.d("進入App", "AppSectionsPagerAdapter");
         }
 
         @Override
         public Fragment getItem(int i) {
+            Log.d("進入App", "getItem");
             switch (i) {
                 case 0:
                     return new CameraView();
@@ -256,11 +263,13 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
 
         @Override
         public int getCount() {
+            Log.d("進入App", "getCount()");
             return 3;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
+            Log.d("進入App", "getPageTitle");
             return mPageTittle.get(position);
         }
     }
@@ -273,6 +282,7 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
         private Button mTakePicBtn, mAddBtn;//拍照按鈕與入帳按鈕
         private ImageView mImageView;
         private LazyChargeActivity mLazyChargeActivity = new LazyChargeActivity();
+        private CalendarSearchView mCalendarSearchView = new CalendarSearchView();
         private EditText mItemName, mItemPrice;
         private Spinner mItemType;
 
@@ -630,6 +640,9 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
 
                 final ImageView itemImageView = (ImageView) convertView.findViewById(R.id.ChargeListImg);
                 itemImageView.setImageBitmap((Bitmap) mItemList.get(position).get("itemImageView"));
+
+                if(mItemList.get(position).get("itemImageView") == null) itemImageView.setImageDrawable(getResources().getDrawable(R.drawable.camerapic));
+
                 TextView itemView = (TextView) convertView.findViewById(R.id.ChargeListTxt);
                 itemView.setText(mItemList.get(position).get("itemData").toString());
                 Button deleteBtn = (Button) convertView.findViewById(R.id.DeleteBtn);
