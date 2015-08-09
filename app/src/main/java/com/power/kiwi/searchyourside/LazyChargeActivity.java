@@ -1,7 +1,6 @@
 package com.power.kiwi.searchyourside;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.ContentValues;
 import android.content.Context;
@@ -66,7 +65,9 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
 
     public static List<String> mPageTittle;//畫面標題
 
+    private static CalendarSearchView mCalendarSearchView = new CalendarSearchView();
 
+    private static BarChartView mBarChartView = new BarChartView();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +120,12 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
                 // We can also use ActionBar.Tab#select() to do this if we have a reference to the
                 // Tab.
                 actionBar.setSelectedNavigationItem(position);
+                if(position == 1){
+                    mCalendarSearchView.setData();
+                }else if(position == 2){
+                    mBarChartView.initView();
+                }
+
             }
         });
 
@@ -160,7 +167,7 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
      *
      * @param picName      圖片名稱，命名格式為年月日時分秒，也是辨別用名稱
      * @param chargeRecord 入帳名稱，可不填
-     * @param chargeType   類別名稱，食衣住行育樂醫療
+     * @param chargeType   類別名稱
      * @param chargePrice  金額
      */
     protected void addDb(String picName, String chargeRecord, String chargeType, String chargePrice) {
@@ -240,36 +247,29 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
      */
     public static class AppSectionsPagerAdapter extends FragmentPagerAdapter {
 
-        FragmentManager fm;
-
         public AppSectionsPagerAdapter(FragmentManager fm) {
             super(fm);
-            this.fm = fm;
-            Log.d("進入App", "AppSectionsPagerAdapter");
         }
 
         @Override
         public Fragment getItem(int i) {
-            Log.d("進入App", "getItem");
             switch (i) {
                 case 0:
                     return new CameraView();
                 case 1:
-                    return new CalendarSearchView();
+                    return mCalendarSearchView;
                 default:
-                    return new BarChartView();
+                    return mBarChartView;
             }
         }
 
         @Override
         public int getCount() {
-            Log.d("進入App", "getCount()");
             return 3;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            Log.d("進入App", "getPageTitle");
             return mPageTittle.get(position);
         }
     }
@@ -565,6 +565,9 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
             }
         }
 
+        /**
+         *
+         * */
         private List<HashMap<String, Object>> getData(String DATE) {
             //新建一個集合類，用於存放多條數據，Map的key是一個String類型，Map的value是Object類型
             ArrayList<HashMap<String, Object>> list = new ArrayList<>();
@@ -607,6 +610,15 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
             return list;
         }
 
+
+        public void setData() {
+
+            //mDate = mCalendarView.getDate();
+            mItemList = getData(new SimpleDateFormat("yyyyMMdd").format(new Date()));
+            mAdapter = new MyAdapter(getActivity());
+            mListView.setAdapter(mAdapter);
+
+        }
 
 
         public class MyAdapter extends BaseAdapter {
@@ -681,6 +693,8 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
      */
     public static class BarChartView extends Fragment {
 
+        BarChartViewModel mBarChartViewModel = new BarChartViewModel();
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
@@ -688,6 +702,13 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
 
 
             return rootView;
+        }
+
+        private void initView(){
+
+            mBarChartViewModel.getMBarChart();
+            mBarChartViewModel.getDBarChart();
+
         }
 
     }

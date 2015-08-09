@@ -16,17 +16,17 @@ public class Option {
      * 在 Android 平台上一個 SharedPreferences 物件會對應到一個檔案，
      * 這個檔案中儲存 key/value 的對應資料，
      * 而 SharedPreferences 物件提供了一些對應的方法來讀寫這些資料。*/
-    SharedPreferences optionSpr;
+    public static SharedPreferences optionSpr;
 
     /**
      * 儲存個人化的整數設定
      * @param key 字串
      * @param value 儲存得值(int)*/
-    protected void setInt(String key,int value){
+    protected void setLong(String key,long value){
 
         SharedPreferences.Editor editor = optionSpr.edit();
 
-        editor.putInt(key, value).apply();
+        editor.putLong(key, value).apply();
         //apply()與commit()差異在於後者會回傳booleen值做確認，所以前者執行效率上會比較快。
     }
     /**
@@ -54,8 +54,9 @@ public class Option {
 
     /**
      * 取得個人化設定整數值
-     * @param key 字串*/
-    public int getInt(String key){
+     * @param key 字串
+     * */
+    public long getLong(String key){
 
 //        // NumberFormat 數字格式
 //        // NumberFormat是一個抽象類別，我們必須用getInstance()來取得他裡面的方法，
@@ -65,13 +66,14 @@ public class Option {
 //        NumberFormat nf = NumberFormat.getInstance();
 //        nf.setMaximumFractionDigits(2);
 
-        return optionSpr.getInt(key, 0);
+        return optionSpr.getLong(key, 0);
 
     }
 
     /**
      * 取得個人化設定整數值，取至小數點第2位
-     * @param key 字串*/
+     * @param key 字串
+     * */
     public Double getDouble(String key){
 
 //        // NumberFormat 數字格式
@@ -92,7 +94,8 @@ public class Option {
 
     /**
      * 取得個人化設定字串
-     * @param key 字串*/
+     * @param key 字串
+     * */
     public String getString(String key){
 
         return optionSpr.getString(key, "null");
