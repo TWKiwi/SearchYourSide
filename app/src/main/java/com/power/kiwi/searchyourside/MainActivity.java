@@ -17,7 +17,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     /**
      * 懶人記帳按鈕與智能管家按鈕
      * */
-    Button mLazyChargeBtn, mSmartButlerBtn;
+    Button mLazyChargeBtn, mSmartButlerBtn, mOptionsBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +34,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private void initView(){
         mLazyChargeBtn = (Button)findViewById(R.id.lazyChargeBtn);
         mSmartButlerBtn = (Button)findViewById(R.id.smartButlerBtn);
+        mOptionsBtn = (Button)findViewById(R.id.OptionBtn);
     }
     /**
      * 設置View物件監聽
@@ -41,6 +42,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private void setListener(){
         mLazyChargeBtn.setOnClickListener(this);
         mSmartButlerBtn.setOnClickListener(this);
+        mOptionsBtn.setOnClickListener(this);
     }
 
     @Override
@@ -79,6 +81,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             case R.id.smartButlerBtn :
 
                 intent = new Intent(this,SmartButlerActivity.class);
+                startActivity(intent);
+                break;
+
+            case R.id.OptionBtn :
+
+                intent = new Intent(this, OptionsActivity.class);
                 startActivity(intent);
                 break;
         }

@@ -74,22 +74,22 @@
 
 
 
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textSize="18sp"
-            android:gravity="center"
-            android:textColor="#2828FF"
-            android:background="#2894FF"
-            android:text="切換開銷類別瀏覽"
+    <!--<TableRow-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:layout_weight="1">-->
+        <!--<Button-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="1"-->
+            <!--android:textSize="18sp"-->
+            <!--android:gravity="center"-->
+            <!--android:textColor="#2828FF"-->
+            <!--android:background="#2894FF"-->
+            <!--android:text="切換開銷類別瀏覽"-->
 
-            android:id="@+id/MD_ScaleBtn"/>
+            <!--android:id="@+id/MD_ScaleBtn"/>-->
 
-    </TableRow>
+    <!--</TableRow>-->
 
 </LinearLayout>

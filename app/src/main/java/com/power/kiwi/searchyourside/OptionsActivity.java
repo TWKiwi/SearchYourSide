@@ -1,27 +1,40 @@
 package com.power.kiwi.searchyourside;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
 /**
  * Created by kiwi on 15/7/1.
  * 這是一個設定類別，用在整體系統客製化方面的資料存取與處理。
  */
-public class Option {
+public class OptionsActivity extends ActionBarActivity {
 
     /**
      * 取得一個 SharedPreferences 物件讓目前的 Activity 使用
      * 在 Android 平台上一個 SharedPreferences 物件會對應到一個檔案，
      * 這個檔案中儲存 key/value 的對應資料，
      * 而 SharedPreferences 物件提供了一些對應的方法來讀寫這些資料。*/
-    public static SharedPreferences optionSpr;
+    public SharedPreferences optionSpr;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_option);
+        optionSpr = getApplication().getSharedPreferences("Option", Context.MODE_PRIVATE);
+    }
 
     /**
      * 儲存個人化的整數設定
      * @param key 字串
-     * @param value 儲存得值(int)*/
+     * @param value 儲存得值(int)
+     * */
     protected void setLong(String key,long value){
 
         SharedPreferences.Editor editor = optionSpr.edit();
@@ -32,7 +45,8 @@ public class Option {
     /**
      * 儲存個人化的整數設定
      * @param key 字串
-     * @param value 儲存得值(Double轉String儲存)*/
+     * @param value 儲存得值(Double轉String儲存)
+     * */
     protected void setDouble(String key,double value){
 
         SharedPreferences.Editor editor = optionSpr.edit();
@@ -43,7 +57,8 @@ public class Option {
     /**
      * 儲存個人化的整數設定
      * @param key 字串
-     * @param value 儲存得值(String)*/
+     * @param value 儲存得值(String)
+     * */
     protected void setString(String key,String value){
 
         SharedPreferences.Editor editor = optionSpr.edit();
@@ -66,7 +81,7 @@ public class Option {
 //        NumberFormat nf = NumberFormat.getInstance();
 //        nf.setMaximumFractionDigits(2);
 
-        return optionSpr.getLong(key, 0);
+        return optionSpr.getLong(key,0);
 
     }
 
@@ -102,4 +117,48 @@ public class Option {
 
     }
 
+    public long getBudget(String s){
+//        optionSpr = getSharedPreferences("Option", 0);
+
+        switch (s){
+            case "mBudget" : return optionSpr.getInt("mBudget", 18000);
+            case "mRglCost" : return optionSpr.getInt("mRglCost",0);
+            case "mScaleTS" : return optionSpr.getInt("mScaleTS",0);
+            case "mFoodRice" : return optionSpr.getInt("rice",0);
+            case "mFoodNoodle" : return optionSpr.getInt("noodles",0);
+
+        }
+
+        return 0;
+    }
+
+
+
+
+
+
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_option, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }
