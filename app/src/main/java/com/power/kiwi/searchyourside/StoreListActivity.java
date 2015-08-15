@@ -79,6 +79,11 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
         StoreListView.setOnItemClickListener(this);
 
         getBundle();
+
+        setListView();
+        MyStoreAdapter adapter = new MyStoreAdapter(this);
+        StoreListView.setAdapter(adapter);
+
     }
 
     private void getBundle(){
@@ -162,29 +167,17 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
             String index_rank = "UPDATE `gps` SET `gRank`=`gFrequency`/`long`";
             MySQLConnector.executeQuery(index_rank);
 
+            //特殊加成
+            String select = "SELECT DISTINCT `fStore` FROM `food` WHERE `fSort` like '%" + mType + "%' ORDER BY `fRank` DESC";
+            JSONArray jsonArray1 = new JSONArray(MySQLConnector.executeQuery(select));
 
-            if(hashMapSort().equals("rice")) {
-                //特殊加成
-                String select = "SELECT DISTINCT `fStore` FROM `food` WHERE `fSort` like '%rice%' ORDER BY `fRank` DESC";
-                JSONArray jsonArray1 = new JSONArray(MySQLConnector.executeQuery(select));
+            for (int i = 0; i < jsonArray1.length(); i++) {
+                JSONObject jsonObject = jsonArray1.getJSONObject(i);
+                MySQLConnector.executeQuery("UPDATE `gps` SET `gRank`=`gFrequency`*10/`long`+50 where `gName` = '" + jsonObject.getString("fStore") + "'");
 
-                for (int i = 0; i < jsonArray1.length(); i++) {
-                    JSONObject jsonObject = jsonArray1.getJSONObject(i);
-                    MySQLConnector.executeQuery("UPDATE `gps` SET `gRank`=`gFrequency`*10/`long`+50 where `gName` = '" + jsonObject.getString("fStore") + "'", php);
-
-                }
-            }else if(hashMapSort().equals("noodles")) {
-                //特殊加成
-                String select = "SELECT DISTINCT `fStore` FROM `food` WHERE `fSort` like '%noodles%' ORDER BY `fRank` DESC";
-                JSONArray jsonArray1 = new JSONArray(MySQLConnector.executeQuery(select));
-
-                for (int i = 0; i < jsonArray1.length(); i++) {
-                    JSONObject jsonObject = jsonArray1.getJSONObject(i);
-                    MySQLConnector.executeQuery("UPDATE `gps` SET `gRank`=`gFrequency`*10/`long`+50 where `gName` = '" + jsonObject.getString("fStore") + "'", php);
-
-                }
             }
-            String index_sel = "SELECT * from `gps` where `long` < 5000 and `gStoreClass` LIKE '%" + SpinnerClass + "%'order by `gRank` desc;";
+
+            String index_sel = "SELECT * from `gps` where `long` < 5000 and `gStoreClass`order by `gRank` desc;";
             String result_sumsel =  MySQLConnector.executeQuery(index_sel);
             JSONArray jsonArray2 = new JSONArray(result_sumsel);
 
