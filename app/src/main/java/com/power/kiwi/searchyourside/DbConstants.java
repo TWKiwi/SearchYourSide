@@ -15,7 +15,7 @@ public interface DbConstants extends BaseColumns {
     /**
      * 圖片名字
      * */
-    public static final String PHNAME = "PicName";
+    public static final String PICNAME = "PicName";
 
     /**
      * 消費名稱
