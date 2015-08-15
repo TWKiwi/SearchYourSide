@@ -402,6 +402,8 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
                             mItemName.getText().toString(),
                             mItemType.getSelectedItem().toString(),
                             mItemPrice.getText().toString());
+                    mOptionActivity.setLong(mItemType.getSelectedItem().toString().trim(),
+                            mOptionActivity.getData(mItemType.getSelectedItem().toString().trim()) + 1);
                     mImageView.setImageDrawable(null);
                     mPicName = "null";
                     mItemName.setText("");
@@ -720,9 +722,9 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             rootView = inflater.inflate(R.layout.bar_chart_view, container, false);
-            mBudget = mOptionActivity.getBudget("mBudget");
-            mRglCost = mOptionActivity.getBudget("mRglCost");
-            mScaleTS = mOptionActivity.getBudget("mScaleTS");
+            mBudget = Long.valueOf(mOptionActivity.getData("mBudget"));
+            mRglCost = Long.valueOf(mOptionActivity.getData("mRglCost"));
+            mScaleTS = Long.valueOf(mOptionActivity.getData("mScaleTS"));
             initView();
 
             return rootView;

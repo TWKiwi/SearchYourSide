@@ -1,11 +1,17 @@
 package com.power.kiwi.searchyourside;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import java.text.DecimalFormat;
 
@@ -13,7 +19,10 @@ import java.text.DecimalFormat;
  * Created by kiwi on 15/7/1.
  * 這是一個設定類別，用在整體系統客製化方面的資料存取與處理。
  */
-public class OptionsActivity extends ActionBarActivity {
+public class OptionsActivity extends ActionBarActivity implements View.OnClickListener {
+
+    Button mSetOptionsBtn, mSetGPSBtn, mAboutUsBtn;
+    EditText mSetBudgetEdt, mSetRglCostEdt;
 
     /**
      * 取得一個 SharedPreferences 物件讓目前的 Activity 使用
@@ -26,16 +35,38 @@ public class OptionsActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_option);
+        setContentView(R.layout.activity_options);
         optionSpr = getApplication().getSharedPreferences("Option", Context.MODE_PRIVATE);
+        initView();
+        initData();
+        setListener();
+    }
+
+    private void initView(){
+        mSetOptionsBtn = (Button) findViewById(R.id.setOptionsBtn);
+        mSetGPSBtn = (Button) findViewById(R.id.setGpsBtn);
+        mAboutUsBtn = (Button) findViewById(R.id.aboutUsBtn);
+        mSetBudgetEdt = (EditText) findViewById(R.id.setBudgetEdt);
+        mSetRglCostEdt = (EditText) findViewById(R.id.setRglCostEdt);
+    }
+
+    private void initData(){
+        mSetBudgetEdt.setText(String.valueOf(getData("mBudget")));
+        mSetRglCostEdt.setText(String.valueOf(getData("mRglCost")));
+    }
+
+    private void setListener(){
+        mSetOptionsBtn.setOnClickListener(this);
+        mSetGPSBtn.setOnClickListener(this);
+        mAboutUsBtn.setOnClickListener(this);
     }
 
     /**
      * 儲存個人化的整數設定
      * @param key 字串
-     * @param value 儲存得值(int)
+     * @param value 儲存得值(Long)
      * */
-    protected void setLong(String key,long value){
+    protected void setLong(String key,Long value){
 
         SharedPreferences.Editor editor = optionSpr.edit();
 
@@ -63,7 +94,7 @@ public class OptionsActivity extends ActionBarActivity {
 
         SharedPreferences.Editor editor = optionSpr.edit();
 
-        editor.putString(key,value).apply();
+        editor.putString(key,value.trim()).apply();
 
     }
 
@@ -117,15 +148,22 @@ public class OptionsActivity extends ActionBarActivity {
 
     }
 
-    public long getBudget(String s){
+    public long getData(String s){
 //        optionSpr = getSharedPreferences("Option", 0);
 
         switch (s){
-            case "mBudget" : return optionSpr.getInt("mBudget", 18000);
-            case "mRglCost" : return optionSpr.getInt("mRglCost",0);
-            case "mScaleTS" : return optionSpr.getInt("mScaleTS",0);
-            case "mFoodRice" : return optionSpr.getInt("rice",0);
-            case "mFoodNoodle" : return optionSpr.getInt("noodles",0);
+
+            case "mBudget" : return optionSpr.getLong("mBudget", 18000);
+            case "mRglCost" : return optionSpr.getLong("mRglCost", 0);
+            case "mScaleTS" : return optionSpr.getLong("mScaleTS", 0);
+            case "飯" : return optionSpr.getLong("飯", 0);
+            case "粥" : return optionSpr.getLong("粥", 0);
+            case "麵" : return optionSpr.getLong("麵", 0);
+            case "中式" : return optionSpr.getLong("中式", 0);
+            case "西式" : return optionSpr.getLong("西式", 0);
+            case "點心" : return optionSpr.getLong("點心", 0);
+            case "冰飲" : return optionSpr.getLong("冰飲", 0);
+            case "其他" : return optionSpr.getLong("其他", 0);
 
         }
 
@@ -160,5 +198,30 @@ public class OptionsActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+
+            case R.id.setOptionsBtn :
+                if (mSetBudgetEdt.getText().toString().equals("") ||
+                        mSetBudgetEdt.getText().toString().equals("0")){
+                    mSetBudgetEdt.setText("18000");
+                }
+                setLong("mBudget", Long.parseLong(mSetBudgetEdt.getText().toString()));
+                setLong("mRglCost", Long.parseLong(mSetRglCostEdt.getText().toString()));
+                break;
+            case R.id.setGpsBtn :
+                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity(intent);
+                break;
+            case R.id.aboutUsBtn :
+                AlertDialog.Builder bdr = new AlertDialog.Builder(OptionsActivity.this);
+                bdr.setMessage("打劫組是由一群對創作與行動裝置抱有熱忱的學生組織而成，目的希望能夠靠著自己的能力去證明，即使在離島就學，在教育程度及能力也能有傑出的表現，並透過參與各種公開比賽磨練自己心智，未來二三十餘年能在職場闖出一片天空．");
+                bdr.setTitle("關於打劫組...");
+                bdr.show();
+                break;
+        }
     }
 }

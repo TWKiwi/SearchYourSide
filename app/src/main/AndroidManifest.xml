@@ -39,8 +39,8 @@
             android:label="@string/title_activity_option" >
         </activity>
         <activity
-            android:name=".OptionsActivity"
-            android:label="@string/title_activity_options" >
+            android:name=".StoreListActivity"
+            android:label="@string/title_activity_food_list" >
         </activity>
     </application>
 

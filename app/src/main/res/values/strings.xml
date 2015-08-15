@@ -1,10 +1,9 @@
 <resources>
     <string name="app_name">SearchYourSide</string>
 
-    <string name="lazyChargerBtn">懶人記帳</string>
-    <string name="smartBulterBtn">智能管家</string>
-    <string name="optionBtn">相關設置</string>
 
+
+    <string name="lazyChargerBtn">懶人記帳</string>
     <string name="takePicAndCharge">拍照記帳</string>
     <string name="TakePicBtnTxt">拍照</string>
     <string name="AddDataBtnTxt">入帳</string>
@@ -26,15 +25,24 @@
     <string name="calendarSearch">月曆查詢</string>
     <string name="DeleteBtn">刪除\n紀錄</string>
 
+    <string name="barChartView">飲食開銷</string>
 
-    <string name="barChartView">各類開銷</string>
+    <string name="smartBulterBtn">美食羅盤</string>
+    <string name="SearchFoodTxt">美食搜尋 :</string>
+    <string name="StartSearchBtn">點我搜尋</string>
 
+    <string name="optionBtn">相關設置</string>
+    <string name="setBudgetTxt">每月\n預算</string>
+    <string name="setRglCostTxt">固定\n開銷</string>
+    <string name="setOptionsBtn">儲存設定</string>
+    <string name="setGpsBtn">GPS設定</string>
+    <string name="aboutUsBtn">關於我們</string>
 
     <string name="action_settings">Settings</string>
-    <string name="title_activity_lazy_charge">懶人記帳</string>
+    <string name="title_activity_lazy_charge">飲食記帳</string>
+    <string name="title_activity_smart_butler">美食羅盤</string>
+    <string name="title_activity_option">相關設置</string>
+    <string name="title_activity_food_list">搜尋結果</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="title_activity_smart_butler">智能管家</string>
-    <string name="title_activity_option">OptionActivity</string>
-    <string name="title_activity_options">OptionsActivity</string>
 </resources>
