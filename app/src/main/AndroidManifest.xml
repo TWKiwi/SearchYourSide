@@ -29,7 +29,7 @@
         <activity
             android:name=".LazyChargeActivity"
             android:label="@string/title_activity_lazy_charge"
-            android:theme="@android:style/Theme.Holo.Light.DarkActionBar" >
+            android:theme="@android:style/Theme.Holo.Light.DarkActionBar"
             android:windowSoftInputMode="stateHidden" >
         </activity>
         <activity

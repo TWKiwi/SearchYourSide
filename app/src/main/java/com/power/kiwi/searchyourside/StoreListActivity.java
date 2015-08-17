@@ -54,8 +54,6 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_store_list);
-        initView();
-
         //連線
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                 .detectDiskReads()
@@ -69,6 +67,10 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
                 .penaltyDeath()
                 .build());
         //連線
+
+        initView();
+
+
 
 
     }
@@ -146,59 +148,42 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
 
 //        if(whatBtn.equals("isProposal")){
 
-
-
-        String index_sum = "UPDATE `ai_pomo`.`gps` SET `gUserX` = " + mLongitude + ", `gUserY` = " + mLatitude + ";";
-        MySQLConnector.executeQuery(index_sum);
-
+        Log.d("test","setListView");
 
         try {
-            String indexG = "SELECT *, \n" +"round(6378.138*2*asin(sqrt(pow(sin( (`gY`*pi()/180-`gUserY`*pi()/180)/2),2)+cos(`gY`*pi()/180)*cos(`gUserY`*pi()/180)* pow(sin( (`gX`*pi()/180-`gUserX`*pi()/180)/2),2)))*1000)  'Distance'  from `gps`;";
-            String resultG  = MySQLConnector.executeQuery(indexG);
-            Log.d("ResultG",resultG);
-            JSONArray jsonArray = new JSONArray(resultG);
 
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonData = jsonArray.getJSONObject(i);
-                int selGps = Integer.parseInt(jsonData.getString("Distance"));
-                String index_long =  "UPDATE `gps` SET `long` = "+ selGps +" where `gId` = '" + (i+1) + ";'";
-                MySQLConnector.executeQuery(index_long);
-            }
-            String index_rank = "UPDATE `gps` SET `gRank`=`gFrequency`/`long`";
-            MySQLConnector.executeQuery(index_rank);
+            String index_sel = "Use `ai_pomo`;CREATE OR REPLACE VIEW GPSDistanceAndStoreTimeView AS" +
+                    "SELECT gId, gName, gX, gY, gOpen, gClose, GPSDistance from `gps`" +
+                    "where round(" + 22.639619 + ",1) = round(`gY`, 1) AND round(" + 120.30211 + ",1) = round(`gX`, 1);";
 
-            //特殊加成
-            String select = "SELECT DISTINCT `fStore` FROM `food` WHERE `fSort` like '%" + mType + "%' ORDER BY `fRank` DESC";
-            JSONArray jsonArray1 = new JSONArray(MySQLConnector.executeQuery(select));
+            MySQLConnector.executeQuery(index_sel);
 
-            for (int i = 0; i < jsonArray1.length(); i++) {
-                JSONObject jsonObject = jsonArray1.getJSONObject(i);
-                MySQLConnector.executeQuery("UPDATE `gps` SET `gRank`=`gFrequency`*10/`long`+50 where `gName` = '" + jsonObject.getString("fStore") + "'");
+            index_sel = "UPDATE `GPSDistanceAndStoreTimeView` set `GPSDistance` =" +
+                    "round(6378.138*2*asin(sqrt(pow(sin(((`gY`-" + 22.639619 + ")*pi()/180)/2),2)+cos(`gY`*pi()/180)*cos(" + 22.639619 + "*pi()/180)* pow(sin(((`gX`-" + 120.30211 + ")*pi()/180)/2),2)))*1000);";
 
-            }
+            MySQLConnector.executeQuery(index_sel);
 
-            String index_sel = "SELECT * from `gps` where `long` < 5000 and `gStoreClass`order by `gRank` desc;";
+            index_sel = "SELECT gName, GPSDistance  from `GPSDistanceAndStoreTimeView` where `gOpen` < " + mTime +" AND `gClose` > "+ mTime +" ORDER BY `GPSDistance` ASC ;";
+
             String result_sumsel =  MySQLConnector.executeQuery(index_sel);
+
+            Log.d("test",result_sumsel);
+
             JSONArray jsonArray2 = new JSONArray(result_sumsel);
 
             setTitle("查詢資料結果");
 
+            int count = 0;
             for (int i = 0; i < jsonArray2.length(); i++) {
                 JSONObject jsonData = jsonArray2.getJSONObject(i);
                 HashMap<String, Object> h2 = new HashMap<String, Object>();
                 h2.put("gName", jsonData.getString("gName"));
-                h2.put("long", jsonData.getString("long") + " 公尺");
-                h2.put("gX", jsonData.getString("gX"));
-                h2.put("gY", jsonData.getString("gY"));
-                h2.put("gUserX", jsonData.getString("gUserX"));
-                h2.put("gUserY", jsonData.getString("gUserY"));
-                h2.put("gPic", jsonData.getString("gPic"));
-                h2.put("Description", jsonData.getString("Description"));
+                h2.put("GPSDistance", jsonData.getString("GPSDistance"));
 
                 StoreList.add(h2);
-
+                count++;
             }
-
+            Log.d("test",""+count);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -297,16 +282,16 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
         public View getView(int position, View convertView, ViewGroup parent) {
             if(convertView == null)convertView = mInflater.inflate(R.layout.store_list_view_object,null);
 
-            final ImageView StoreListImage = (ImageView)convertView.findViewById(R.id.StoreListImage);
-            byte[] decodedString = Base64.decode(StoreList.get(position).get("gPic").toString(), Base64.DEFAULT);
-            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-            StoreListImage.setImageBitmap(decodedByte);
+//            final ImageView StoreListImage = (ImageView)convertView.findViewById(R.id.StoreListImage);
+//            byte[] decodedString = Base64.decode(StoreList.get(position).get("gPic").toString(), Base64.DEFAULT);
+//            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+//            StoreListImage.setImageBitmap(decodedByte);
 
 //         itemImageView.setImageBitmap((Bitmap)StoreList.get(position).get("gPic"));
             TextView StoreListStoreText = (TextView)convertView.findViewById(R.id.StoreListStoreText);
             StoreListStoreText.setText(StoreList.get(position).get("gName").toString());
             TextView StoreListDistanceText = (TextView)convertView.findViewById(R.id.StoreListDistanceText);
-            StoreListDistanceText.setText(StoreList.get(position).get("long").toString());
+            StoreListDistanceText.setText(StoreList.get(position).get("GPSDistance").toString());
 
 
             return convertView;

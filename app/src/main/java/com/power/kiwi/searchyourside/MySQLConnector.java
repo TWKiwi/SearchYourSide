@@ -25,7 +25,7 @@ public class MySQLConnector {
 
         try {
             HttpClient httpClient = new DefaultHttpClient();
-            HttpPost httpPost = new HttpPost("http://25.108.184.23/AndroidConnectDB/GPS_Connector.php");
+            HttpPost httpPost = new HttpPost("http://203.68.252.55/AndroidConnectDB/GPS_Connector.php");
             ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
             params.add(new BasicNameValuePair("query_string", query_string));
             httpPost.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
