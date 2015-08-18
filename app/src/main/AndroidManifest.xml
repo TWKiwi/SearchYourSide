@@ -46,6 +46,14 @@
             android:name=".StoreListActivity"
             android:label="@string/title_activity_food_list" >
         </activity>
+        <activity
+            android:name=".FoodListActivity"
+            android:label="@string/title_activity_food_list" >
+        </activity>
+        <activity
+            android:name=".EditStoreDataActivity"
+            android:label="@string/title_activity_edit_store_data" >
+        </activity>
     </application>
 
 </manifest>

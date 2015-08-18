@@ -14,6 +14,12 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by kiwi on 15/7/1.
@@ -71,7 +77,7 @@ public class OptionsActivity extends ActionBarActivity implements View.OnClickLi
         SharedPreferences.Editor editor = optionSpr.edit();
 
         editor.putLong(key, value).apply();
-        //apply()與commit()差異在於後者會回傳booleen值做確認，所以前者執行效率上會比較快。
+        //apply()與commit()差異在於後者會回傳boolean值做確認，所以前者執行效率上會比較快。
     }
     /**
      * 儲存個人化的整數設定
@@ -83,58 +89,6 @@ public class OptionsActivity extends ActionBarActivity implements View.OnClickLi
         SharedPreferences.Editor editor = optionSpr.edit();
 
         editor.putString(key, String.valueOf(value)).apply();
-
-    }
-    /**
-     * 儲存個人化的整數設定
-     * @param key 字串
-     * @param value 儲存得值(String)
-     * */
-    protected void setString(String key,String value){
-
-        SharedPreferences.Editor editor = optionSpr.edit();
-
-        editor.putString(key,value.trim()).apply();
-
-    }
-
-    /**
-     * 取得個人化設定整數值
-     * @param key 字串
-     * */
-    public long getLong(String key){
-
-//        // NumberFormat 數字格式
-//        // NumberFormat是一個抽象類別，我們必須用getInstance()來取得他裡面的方法，
-//        // 因此第1行NumberFormat nf = NumberFormat.getInstance();宣告了一個NumberFormat物件。
-//        // NumberFormat物件格式化的方式是固定的，都是以每三位數一個逗號的方式格式化數字，
-//        // 浮點數欄位則是有的時候顯示，沒有就不顯示。
-//        NumberFormat nf = NumberFormat.getInstance();
-//        nf.setMaximumFractionDigits(2);
-
-        return optionSpr.getLong(key,0);
-
-    }
-
-    /**
-     * 取得個人化設定整數值，取至小數點第2位
-     * @param key 字串
-     * */
-    public Double getDouble(String key){
-
-//        // NumberFormat 數字格式
-//        // NumberFormat是一個抽象類別，我們必須用getInstance()來取得他裡面的方法，
-//        // 因此第1行NumberFormat nf = NumberFormat.getInstance();宣告了一個NumberFormat物件。
-//        // NumberFormat物件格式化的方式是固定的，都是以每三位數一個逗號的方式格式化數字，
-//        // 浮點數欄位則是有的時候顯示，沒有就不顯示。
-//        NumberFormat nf = NumberFormat.getInstance();
-//        nf.setMaximumFractionDigits(2);
-//
-//        return nf.format(Double.parseDouble(optionSpr.getString(key,"0.0")));
-
-        DecimalFormat df = new DecimalFormat("0.00");
-
-        return Double.parseDouble(df.format(Double.parseDouble(optionSpr.getString(key,"0.0"))));
 
     }
 
@@ -170,13 +124,34 @@ public class OptionsActivity extends ActionBarActivity implements View.OnClickLi
         return 0;
     }
 
+    /**
+     * 使用者飲食記錄做類別排序
+     * */
+    public String hashMapSort(){
 
+        HashMap<String,Long> hashMap = new HashMap<>();
+        hashMap.put("飯",getData("飯"));
+        hashMap.put("粥",getData("粥"));
+        hashMap.put("麵",getData("麵"));
+        hashMap.put("油炸",getData("油炸"));
+        hashMap.put("中式",getData("中式"));
+        hashMap.put("西式",getData("西式"));
+        hashMap.put("點心",getData("點心"));
+        hashMap.put("冰飲",getData("冰飲"));
+        hashMap.put("其他",getData("其他"));
 
+        List<Map.Entry<String,Long>> listData = new ArrayList<Map.Entry<String,Long>>(hashMap.entrySet());
 
+        Collections.sort(listData, new Comparator<Map.Entry<String, Long>>() {
+            public int compare(Map.Entry<String, Long> entry1,
+                               Map.Entry<String, Long> entry2) {
+                return (int) (entry2.getValue() - entry1.getValue());
+            }
+        });
+        //取得首筆資料
+        return listData.get(0).getKey();
 
-
-
-
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -1,6 +1,8 @@
 package com.power.kiwi.searchyourside;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,7 +13,6 @@ import android.location.LocationManager;
 import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -28,6 +30,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -35,18 +43,19 @@ import java.util.HashMap;
 public class StoreListActivity extends ActionBarActivity implements LocationListener, AdapterView.OnItemClickListener {
 
     private String mInputType,mTime,mName,mType;
-    private ListView StoreListView,FoodListView;
-    private ImageView StorePic;
-    private TextView StoreTxt,StoreName;
-    private int mNumber,StorePosition;
-    private ArrayList<HashMap<String, Object>> StoreList = new ArrayList<HashMap<String, Object>>();
-    private ArrayList<HashMap<String, Object>> FoodList;
+    private ListView mStoreListView,mFoodListView;
+    private ImageView mStorePic;
+    private Button mSearchFoodBtn,mHelpEditBtn,mGPSGoBtn;
+    private TextView mStoreDataTxt,mStoreName;
+    private int mNumber,mStorePosition;
+    private ArrayList<HashMap<String, Object>> mStoreList = new ArrayList<HashMap<String, Object>>();
+    private ArrayList<HashMap<String, Object>> mClickStoreData = new ArrayList<>();
 
     /**
      * 定位工程
      * */
-    static final int MIN_TIME = 5000;
-    static final float MIN_DIST = 5;
+    static final int mMIN_TIME = 5000;
+    static final float mMIN_DIST = 5;
     private LocationManager mLocationManager;
     double mLatitude,mLongitude;
 
@@ -77,14 +86,14 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
 
     private void initView(){
         mLocationManager = (LocationManager)getSystemService(LOCATION_SERVICE);
-        StoreListView = (ListView)findViewById(R.id.StoreList);
-        StoreListView.setOnItemClickListener(this);
+        mStoreListView = (ListView)findViewById(R.id.StoreList);
+        mStoreListView.setOnItemClickListener(this);
 
         getBundle();
 
         setListView();
         MyStoreAdapter adapter = new MyStoreAdapter(this);
-        StoreListView.setAdapter(adapter);
+        mStoreListView.setAdapter(adapter);
 
     }
 
@@ -134,7 +143,7 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
 //                    h2.put("HospitalDistance", jsonData.getString("HospitalDistance") + " 公尺");
 //
 //
-//                    StoreList.add(h2);
+//                    mStoreList.add(h2);
 //
 //                }
 //
@@ -143,7 +152,7 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
 //            }
 //        }
 //
-//        return StoreList;
+//        return mStoreList;
 
 
 //        if(whatBtn.equals("isProposal")){
@@ -151,45 +160,104 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
         Log.d("test","setListView");
 
         try {
-
-            String index_sel = "Use `ai_pomo`;CREATE OR REPLACE VIEW GPSDistanceAndStoreTimeView AS" +
-                    "SELECT gId, gName, gX, gY, gOpen, gClose, GPSDistance from `gps`" +
-                    "where round(" + 22.639619 + ",1) = round(`gY`, 1) AND round(" + 120.30211 + ",1) = round(`gX`, 1);";
-
-            MySQLConnector.executeQuery(index_sel);
-
-            index_sel = "UPDATE `GPSDistanceAndStoreTimeView` set `GPSDistance` =" +
-                    "round(6378.138*2*asin(sqrt(pow(sin(((`gY`-" + 22.639619 + ")*pi()/180)/2),2)+cos(`gY`*pi()/180)*cos(" + 22.639619 + "*pi()/180)* pow(sin(((`gX`-" + 120.30211 + ")*pi()/180)/2),2)))*1000);";
-
-            MySQLConnector.executeQuery(index_sel);
-
-            index_sel = "SELECT gName, GPSDistance  from `GPSDistanceAndStoreTimeView` where `gOpen` < " + mTime +" AND `gClose` > "+ mTime +" ORDER BY `GPSDistance` ASC ;";
-
-            String result_sumsel =  MySQLConnector.executeQuery(index_sel);
-
-            Log.d("test",result_sumsel);
-
-            JSONArray jsonArray2 = new JSONArray(result_sumsel);
-
-            setTitle("查詢資料結果");
-
             int count = 0;
-            for (int i = 0; i < jsonArray2.length(); i++) {
-                JSONObject jsonData = jsonArray2.getJSONObject(i);
-                HashMap<String, Object> h2 = new HashMap<String, Object>();
-                h2.put("gName", jsonData.getString("gName"));
-                h2.put("GPSDistance", jsonData.getString("GPSDistance"));
+            if(mNumber == 0){
+                String index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.GPSDistanceAndStoreTimeView AS " +
+                         "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency,GPSDistance from `ai_pomo`.`gps` where `gName` like '%" + mName + "%';";
+                MySQLConnector.executeQuery(index_sel);
 
-                StoreList.add(h2);
-                count++;
+                index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.StoreDistanceView AS " +
+                         "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency, GPSDistance from `ai_pomo`.`store information` where `gName` like '%" + mName + "%';";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView` set `GPSDistance` = round(6378.138*2*asin(sqrt(pow(sin(((`gY`-24.801643)*pi()/180)/2),2)+" +
+                        "cos(`gY`*pi()/180)*cos(24.801643*pi()/180)* pow(sin(((`gX`-120.971695)*pi()/180)/2),2)))*1000);";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView` set `gFrequency` = `gFrequency` /`GPSDistance`;";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `GPSDistance` = round(6378.138*2*asin(sqrt(pow(sin(((`gY`-24.801643)*pi()/180)/2),2)+" +
+                        "cos(`gY`*pi()/180)*cos(24.801643*pi()/180)* pow(sin(((`gX`-120.971695)*pi()/180)/2),2)))*1000);";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `gFrequency` = `gFrequency` /`GPSDistance`;";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "SELECT gId,gName,gOpen, gClose, gFrequency, GPSDistance from `ai_pomo`.`GPSDistanceAndStoreTimeView` where `gOpen` < " + mTime + " OR `gClose`>" + mTime +
+                           " union " +
+                           "SELECT gId,gName,gOpen, gClose, gFrequency, GPSDistance from `ai_pomo`.`StoreDistanceView` where `gOpen` < " + mTime + " OR `gClose`> " + mTime + " ORDER BY `gFrequency` DESC, `GPSDistance` ASC ;";
+                String result_sumsel = MySQLConnector.executeQuery(index_sel);
+
+                Log.d("test",result_sumsel);
+
+                JSONArray jsonArray2 = new JSONArray(result_sumsel);
+
+                setTitle("查詢資料結果");
+
+                for (int i = 0; i < jsonArray2.length(); i++) {
+                    JSONObject jsonData = jsonArray2.getJSONObject(i);
+                    HashMap<String, Object> h2 = new HashMap<String, Object>();
+                    h2.put("gId", jsonData.getString("gId"));
+                    h2.put("gName", jsonData.getString("gName"));
+                    h2.put("GPSDistance", jsonData.getString("GPSDistance"));
+
+                    mStoreList.add(h2);
+                    count++;
+                }
+            }else if(mNumber == 2){
+                String index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.GPSDistanceAndStoreTimeView AS " +
+                        "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency,GPSDistance from `ai_pomo`.`gps` WHERE round( " + 24.989206 + " ,2) = round(`gY`, 2) AND round(" + 121.313548 + ", 2) = round(`gX`, 2);";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.StoreDistanceView AS " +
+                        "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency, GPSDistance from `ai_pomo`.`store information` WHERE round( "+ 24.989206 + " ,2) = round(`gY`, 2) AND round(" + 121.313548 + ", 2) = round(`gX`, 2);";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView` set `GPSDistance` = round(6378.138*2*asin(sqrt(pow(sin(((`gY`- " + 24.989206 + ")*pi()/180)/2),2)+" +
+                        "cos(`gY`*pi()/180)*cos(" + 24.989206 + "*pi()/180)* pow(sin(((`gX`-" + 121.313548 + ")*pi()/180)/2),2)))*1000);";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView` set `gFrequency` = `gFrequency` /`GPSDistance`;";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `GPSDistance` = round(6378.138*2*asin(sqrt(pow(sin(((`gY`-" + 24.989206 + ")*pi()/180)/2),2)+" +
+                        "cos(`gY`*pi()/180)*cos(" + 24.989206 + "*pi()/180)* pow(sin(((`gX`-" + 121.313548 + ")*pi()/180)/2),2)))*1000);";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `gFrequency` = `gFrequency` /`GPSDistance`;";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "SELECT gId,gName,gOpen, gClose, gFrequency, GPSDistance from `ai_pomo`.`GPSDistanceAndStoreTimeView` where `gOpen` < " + mTime + " OR `gClose`>" + mTime +
+                        " union " +
+                        "SELECT gId,gName,gOpen, gClose, gFrequency, GPSDistance from `ai_pomo`.`StoreDistanceView` where `gOpen` < " + mTime + " OR `gClose`> " + mTime + " ORDER BY `gFrequency` DESC, `GPSDistance` ASC ;";
+                String result_sumsel = MySQLConnector.executeQuery(index_sel);
+
+                Log.d("test",result_sumsel);
+
+                JSONArray jsonArray2 = new JSONArray(result_sumsel);
+
+                setTitle("查詢資料結果");
+
+                for (int i = 0; i < jsonArray2.length(); i++) {
+                    JSONObject jsonData = jsonArray2.getJSONObject(i);
+                    HashMap<String, Object> h2 = new HashMap<String, Object>();
+                    h2.put("gId", jsonData.getString("gId"));
+                    h2.put("gName", jsonData.getString("gName"));
+                    h2.put("GPSDistance", jsonData.getString("GPSDistance"));
+
+                    mStoreList.add(h2);
+                    count++;
+                }
             }
+
             Log.d("test",""+count);
         } catch (JSONException e) {
             e.printStackTrace();
         }
 //    }
 
-        return StoreList;
+        return mStoreList;
     }
 
     @Override
@@ -198,7 +266,7 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
         //取得最佳定位提供者
         String best = mLocationManager.getBestProvider(new Criteria(), true);//true 找出已啟用
         if(best != null){
-            mLocationManager.requestLocationUpdates(best, MIN_TIME, MIN_DIST, this);//註冊監聽器
+            mLocationManager.requestLocationUpdates(best, mMIN_TIME, mMIN_DIST, this);//註冊監聽器
         }
     }
 
@@ -265,7 +333,7 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
         }
         @Override
         public int getCount() {
-            return StoreList.size();
+            return mStoreList.size();
         }
 
         @Override
@@ -283,15 +351,17 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
             if(convertView == null)convertView = mInflater.inflate(R.layout.store_list_view_object,null);
 
 //            final ImageView StoreListImage = (ImageView)convertView.findViewById(R.id.StoreListImage);
-//            byte[] decodedString = Base64.decode(StoreList.get(position).get("gPic").toString(), Base64.DEFAULT);
+//            byte[] decodedString = Base64.decode(mStoreList.get(position).get("gPic").toString(), Base64.DEFAULT);
 //            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
 //            StoreListImage.setImageBitmap(decodedByte);
 
-//         itemImageView.setImageBitmap((Bitmap)StoreList.get(position).get("gPic"));
+//         itemImageView.setImageBitmap((Bitmap)mStoreList.get(position).get("gPic"));
+
+
             TextView StoreListStoreText = (TextView)convertView.findViewById(R.id.StoreListStoreText);
-            StoreListStoreText.setText(StoreList.get(position).get("gName").toString());
+            StoreListStoreText.setText(mStoreList.get(position).get("gName").toString());
             TextView StoreListDistanceText = (TextView)convertView.findViewById(R.id.StoreListDistanceText);
-            StoreListDistanceText.setText(StoreList.get(position).get("GPSDistance").toString());
+            StoreListDistanceText.setText(mStoreList.get(position).get("GPSDistance").toString());
 
 
             return convertView;
@@ -301,5 +371,160 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+        AlertDialog.Builder StoreView = new AlertDialog.Builder(this);
+        LayoutInflater inflater = LayoutInflater.from(this);
+        view = inflater.inflate(R.layout.store_data_object, null);
+        mStoreName = (TextView)view.findViewById(R.id.storeNameTxt);
+        mStorePic = (ImageView)view.findViewById(R.id.storeImage);
+        mStoreDataTxt = (TextView)view.findViewById(R.id.storeDataTxt);
+        mSearchFoodBtn = (Button)view.findViewById(R.id.SearchFoodBtn);
+        mHelpEditBtn = (Button)view.findViewById(R.id.HelpEditBtn);
+        mGPSGoBtn = (Button)view.findViewById(R.id.GPSGoBtn);
+
+
+        try {
+
+            String index_sel = "SELECT gName,Address, gOpen, gClose,gX, gY,Picture , Description FROM `ai_pomo`.`gps` WHERE `gName` = '" +
+                    mStoreList.get(position).get("gName").toString() + "' AND `gid` = " + mStoreList.get(position).get("gId").toString() +
+                    " union SELECT gName,Address, gOpen, gClose,gX, gY,Picture , Description FROM `ai_pomo`.`store information` WHERE `gName` = '" +
+                    mStoreList.get(position).get("gName").toString() + "' AND `gid` = " + mStoreList.get(position).get("gId").toString() + ";";
+
+            String result_sumsel = MySQLConnector.executeQuery(index_sel);
+
+            Log.d("test",result_sumsel);
+
+            JSONArray jsonArray2 = new JSONArray(result_sumsel);
+
+            setTitle("查詢資料結果");
+
+            int count = 0;
+            for (int i = 0; i < jsonArray2.length(); i++) {
+                JSONObject jsonData = jsonArray2.getJSONObject(i);
+                HashMap<String, Object> h2 = new HashMap<String, Object>();
+                h2.put("gName", jsonData.getString("gName"));
+                h2.put("Address", jsonData.getString("Address"));
+                h2.put("gOpen", jsonData.getString("gOpen"));
+                h2.put("gClose", jsonData.getString("gClose"));
+                h2.put("gX", jsonData.getString("gX"));
+                h2.put("gY", jsonData.getString("gY"));
+                h2.put("Picture", jsonData.getString("Picture"));
+                h2.put("Description", jsonData.getString("Description"));
+
+
+                mClickStoreData.add(h2);
+                count++;
+            }
+            Log.d("test",""+count);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if(mClickStoreData.get(0).get("Picture").toString().length() > 0) {
+            try {
+                URL url = new URL(mClickStoreData.get(0).get("Picture").toString());
+                URLConnection conn = url.openConnection();
+
+                HttpURLConnection httpConn = (HttpURLConnection) conn;
+                httpConn.setRequestMethod("GET");
+                httpConn.connect();
+
+                if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    InputStream inputStream = httpConn.getInputStream();
+
+                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                    inputStream.close();
+                    mStorePic.setImageBitmap(bitmap);
+                }
+            } catch (MalformedURLException e1) {
+                e1.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            try {
+                URL url = new URL("http://203.68.252.55/AndroidConnectDB/DJZ.jpg");
+                URLConnection conn = url.openConnection();
+
+                HttpURLConnection httpConn = (HttpURLConnection) conn;
+                httpConn.setRequestMethod("GET");
+                httpConn.connect();
+
+                if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    InputStream inputStream = httpConn.getInputStream();
+
+                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                    inputStream.close();
+                    mStorePic.setImageBitmap(bitmap);
+                }
+            } catch (MalformedURLException e1) {
+                e1.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        String OpenTime = mClickStoreData.get(0).get("gOpen").toString();
+
+        if(100 < Integer.parseInt(OpenTime) && Integer.parseInt(OpenTime) < 1000 ){
+            OpenTime = OpenTime.substring(0, 1) + ":" + OpenTime.substring(1,3);
+        }else if(Integer.parseInt(OpenTime) >= 1000){
+            OpenTime = OpenTime.substring(0,2) + ":" + OpenTime.substring(2,4);
+        }else {
+            OpenTime = "00:00";
+        }
+
+        String CloseTime = mClickStoreData.get(0).get("gClose").toString();
+
+        if(100 < Integer.parseInt(CloseTime) && Integer.parseInt(CloseTime) < 1000 ){
+            CloseTime = CloseTime.substring(0,1) + ":" + CloseTime.substring(1,3);
+        }else if(Integer.parseInt(CloseTime) >= 1000){
+            CloseTime = CloseTime.substring(0,2) + ":" + CloseTime.substring(2,4);
+        }else {
+            CloseTime = "00:00";
+        }
+
+
+        mStoreName.setText(mClickStoreData.get(0).get("gName").toString().trim());
+        mStoreDataTxt.setText(
+                "店家地址：" +
+                mClickStoreData.get(0).get("Address").toString().trim() + "\n" +
+                "店家介紹：" +
+                mClickStoreData.get(0).get("Description").toString().trim() + "\n" +
+                "營業時間：" +
+                OpenTime + " ~ " + CloseTime);
+
+        mSearchFoodBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(StoreListActivity.this,FoodListActivity.class);
+                intent.putExtra("gName",mClickStoreData.get(0).get("gName").toString().trim());
+                intent.putExtra("gX",mClickStoreData.get(0).get("gX").toString().trim());
+                intent.putExtra("gY",mClickStoreData.get(0).get("gY").toString().trim());
+                startActivity(intent);
+            }
+        });
+
+        mHelpEditBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        mGPSGoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        StoreView.setView(view);
+        StoreView.setPositiveButton("離開", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //do nothing and close view
+            }
+        });
+        StoreView.show();
+        mClickStoreData.clear();
     }
 }

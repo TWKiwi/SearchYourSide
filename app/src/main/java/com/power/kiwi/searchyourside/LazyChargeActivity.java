@@ -80,7 +80,7 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
 
     private static BarChartView mBarChartView = new BarChartView();
 
-    static OptionsActivity mOptionActivity = new OptionsActivity();
+    public static OptionsActivity mOptionsActivity = new OptionsActivity();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +98,7 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
     private void initView() {
 
 
-        mOptionActivity.optionSpr = getApplication().getSharedPreferences("Option", Context.MODE_PRIVATE);
+        mOptionsActivity.optionSpr = getApplication().getSharedPreferences("Option", Context.MODE_PRIVATE);
         //設定三個頁面標題
         mPageTittle = new ArrayList<>();
         mPageTittle.add("拍照記帳");
@@ -402,8 +402,9 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
                             mItemName.getText().toString(),
                             mItemType.getSelectedItem().toString(),
                             mItemPrice.getText().toString());
-                    mOptionActivity.setLong(mItemType.getSelectedItem().toString().trim(),
-                            mOptionActivity.getData(mItemType.getSelectedItem().toString().trim()) + 1);
+                    mOptionsActivity.setLong(mItemType.getSelectedItem().toString().trim(),
+                            mOptionsActivity.getData(mItemType.getSelectedItem().toString().trim()) + 1);
+                    Log.d("test", mItemType.getSelectedItem().toString().trim() + " " +String.valueOf(mOptionsActivity.getData(mItemType.getSelectedItem().toString().trim())));
                     mImageView.setImageDrawable(null);
                     mPicName = "null";
                     mItemName.setText("");
@@ -681,7 +682,6 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
                 deleteBtn.setOnClickListener(new Button.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
 //                    try{
                         mItemList.remove(position);
                         notifyDataSetChanged();
@@ -722,9 +722,9 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             rootView = inflater.inflate(R.layout.bar_chart_view, container, false);
-            mBudget = Long.valueOf(mOptionActivity.getData("mBudget"));
-            mRglCost = Long.valueOf(mOptionActivity.getData("mRglCost"));
-            mScaleTS = Long.valueOf(mOptionActivity.getData("mScaleTS"));
+            mBudget = mOptionsActivity.getData("mBudget");
+            mRglCost = mOptionsActivity.getData("mRglCost");
+            mScaleTS = mOptionsActivity.getData("mScaleTS");
             initView();
 
             return rootView;
@@ -972,6 +972,9 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
             renderer.setLabelsColor(labelsColor);
         }
 
+
+
     }
+
 
 }

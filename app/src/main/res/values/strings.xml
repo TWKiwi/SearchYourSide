@@ -30,6 +30,14 @@
     <string name="smartBulterBtn">美食羅盤</string>
     <string name="SearchFoodTxt">美食搜尋 :</string>
     <string name="StartSearchBtn">點我搜尋</string>
+    <string name="SearchFoodBtn">觀看菜單</string>
+    <string name="HelpEditBtn">協助編輯</string>
+    <string name="GPSBtn">導航 GO!</string>
+    <string name="StoreName">店家\n名稱</string>
+    <string name="StoreDescription">店家\n介紹</string>
+    <string name="StoreRemarkNote">店家\n備註</string>
+    <string name="StoreEditBtn">提交編輯</string>
+    <string name="EditCancelBtn">取消編輯</string>
 
     <string name="optionBtn">相關設置</string>
     <string name="setBudgetTxt">每月\n預算</string>
@@ -45,4 +53,5 @@
     <string name="title_activity_food_list">搜尋結果</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_edit_store_data">EditStoreDataActivity</string>
 </resources>

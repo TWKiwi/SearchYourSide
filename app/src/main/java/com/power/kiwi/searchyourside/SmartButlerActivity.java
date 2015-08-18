@@ -54,7 +54,7 @@ public class SmartButlerActivity extends ActionBarActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_smart_butler);
-
+        mOptionsActivity.optionSpr = getApplication().getSharedPreferences("Option", Context.MODE_PRIVATE);
         /* 實體化View */
         mEditText = (EditText) findViewById(R.id.SearchFoodEdit);
         mListView = (ListView) findViewById(R.id.lv);
@@ -159,7 +159,7 @@ public class SmartButlerActivity extends ActionBarActivity implements View.OnCli
                     startActivity(intent);
                     mShowTxt.setText(mEditText.getText());
 
-                }else if(mItemList.size() > 0){
+                }else if(mShowTxt.length() > 0){
 
                     StringBuilder stringBuilder = new StringBuilder();
                     for(int i = 0; i < mItemList.size(); i++){
@@ -181,47 +181,19 @@ public class SmartButlerActivity extends ActionBarActivity implements View.OnCli
 
                     Intent intent = new Intent(this,StoreListActivity.class);
                     intent.putExtra("inputType","SystemChoice");
-                    intent.putExtra("Type",hashMapSort());
+                    intent.putExtra("Type",mOptionsActivity.hashMapSort());
                     intent.putExtra("Time",time);
                     intent.putExtra("Number",2);
                     startActivity(intent);
 
                 }
                 dataChanged();
-
+                mShowTxt.setText("");
                 break;
 
         }
     }
 
-    /**
-     * 使用者飲食記錄做類別排序
-     * */
-    private String hashMapSort(){
-
-        HashMap<String,Long> hashMap = new HashMap<>();
-        hashMap.put("飯",mOptionsActivity.getData("飯"));
-        hashMap.put("粥",mOptionsActivity.getData("粥"));
-        hashMap.put("麵",mOptionsActivity.getData("麵"));
-        hashMap.put("油炸",mOptionsActivity.getData("油炸"));
-        hashMap.put("中式",mOptionsActivity.getData("中式"));
-        hashMap.put("西式",mOptionsActivity.getData("西式"));
-        hashMap.put("點心",mOptionsActivity.getData("點心"));
-        hashMap.put("冰飲",mOptionsActivity.getData("冰飲"));
-        hashMap.put("其他",mOptionsActivity.getData("其他"));
-
-        List<Map.Entry<String,Long>> listData = new ArrayList<Map.Entry<String,Long>>(hashMap.entrySet());
-
-        Collections.sort(listData, new Comparator<Map.Entry<String, Long>>() {
-            public int compare(Map.Entry<String, Long> entry1,
-                               Map.Entry<String, Long> entry2) {
-                return (int) (entry2.getValue() - entry1.getValue());
-            }
-        });
-        //取得首筆資料
-        return listData.get(0).getKey();
-
-    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
