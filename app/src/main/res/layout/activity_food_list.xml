@@ -14,19 +14,25 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="2"
-            android:id="@+id/FoodNameTxt"/>
+            android:id="@+id/FoodNameTxt"
+            android:gravity="center"
+            android:text="@string/FoodNameTxt"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:id="@+id/FoodPriceTxt"/>
+            android:id="@+id/FoodPriceTxt"
+            android:gravity="center"
+            android:text="@string/FoodPriceTxt"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:id="@+id/FoodAddScore"/>
+            android:id="@+id/FoodAddScore"
+            android:gravity="center"
+            android:text="@string/FoodAddScore"/>
 
     </LinearLayout>
 

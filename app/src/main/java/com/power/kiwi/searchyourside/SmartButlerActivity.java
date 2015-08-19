@@ -147,7 +147,7 @@ public class SmartButlerActivity extends ActionBarActivity implements View.OnCli
                 break;
 
             case R.id.StartSearchBtn :
-                String s = "";
+                String[] arrayType = new String[8];
                 String time = new SimpleDateFormat("HHmm").format(new Date());
                 if(mEditText.length() != 0){
 
@@ -160,22 +160,21 @@ public class SmartButlerActivity extends ActionBarActivity implements View.OnCli
                     mShowTxt.setText(mEditText.getText());
 
                 }else if(mShowTxt.length() > 0){
-
-                    StringBuilder stringBuilder = new StringBuilder();
+                    int num = 0;
                     for(int i = 0; i < mItemList.size(); i++){
                         if(MyAdapter.getIsSelected().get(i)){
-                            s = stringBuilder.append(mItemList.get(i)).toString();
+                            arrayType[num] = mItemList.get(i);
+                            num++;
                         }
                     }
 
                     Intent intent = new Intent(this,StoreListActivity.class);
                     intent.putExtra("inputType","TypeChoice");
-                    intent.putExtra("Type",s);
+                    intent.putExtra("arrayType",arrayType);
                     intent.putExtra("Time",time);
                     intent.putExtra("Number",1);
                     startActivity(intent);
 
-                    mShowTxt.setText(s);
 
                 }else {
 

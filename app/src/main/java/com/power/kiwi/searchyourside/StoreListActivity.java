@@ -10,6 +10,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -43,12 +44,13 @@ import java.util.HashMap;
 public class StoreListActivity extends ActionBarActivity implements LocationListener, AdapterView.OnItemClickListener {
 
     private String mInputType,mTime,mName,mType;
+    private String[] mArrayType;
     private ListView mStoreListView,mFoodListView;
     private ImageView mStorePic;
     private Button mSearchFoodBtn,mHelpEditBtn,mGPSGoBtn;
     private TextView mStoreDataTxt,mStoreName;
-    private int mNumber,mStorePosition;
-    private ArrayList<HashMap<String, Object>> mStoreList = new ArrayList<HashMap<String, Object>>();
+    private int mNumber;
+    private ArrayList<HashMap<String, Object>> mStoreList = new ArrayList<>();
     private ArrayList<HashMap<String, Object>> mClickStoreData = new ArrayList<>();
 
     /**
@@ -57,12 +59,15 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
     static final int mMIN_TIME = 5000;
     static final float mMIN_DIST = 5;
     private LocationManager mLocationManager;
-    double mLatitude,mLongitude;
+    double mLatitude = 24.989206;
+    double mLongitude = 121.313548;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_store_list);
+
+
         //連線
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                 .detectDiskReads()
@@ -78,9 +83,6 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
         //連線
 
         initView();
-
-
-
 
     }
 
@@ -104,9 +106,10 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
         mTime = intent.getStringExtra("Time");
         mName = intent.getStringExtra("Name");
         mType = intent.getStringExtra("Type");
+        mArrayType = intent.getStringArrayExtra("arrayType");
         mNumber = intent.getIntExtra("Number",2);
 
-        Log.d("Test", mInputType + "\n" + mTime + "\n" + mName + "\n" + mType + "\n" + mNumber);
+        Log.d("Test", mInputType + "\n" + mTime + "\n" + mName + "\n" + mType + "\n" + mArrayType[1] + "\n" + mNumber);
     }
 
     private ArrayList<HashMap<String, Object>> setListView(){
@@ -157,11 +160,12 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
 
 //        if(whatBtn.equals("isProposal")){
 
-        Log.d("test","setListView");
+
 
         try {
             int count = 0;
             if(mNumber == 0){
+                Log.d("test","mNumber == 0");
                 String index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.GPSDistanceAndStoreTimeView AS " +
                          "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency,GPSDistance from `ai_pomo`.`gps` where `gName` like '%" + mName + "%';";
                 MySQLConnector.executeQuery(index_sel);
@@ -205,24 +209,58 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
                     mStoreList.add(h2);
                     count++;
                 }
+            }else if (mNumber == 1){
+
+                Log.d("test","mNumber == 1 " + mArrayType.length);
+                String mSelect = "";
+                for (int i = 0; mArrayType.length > i ; i++){
+                    if(mArrayType[i] == null) break;
+                    if(mSelect.equals("")){
+                        mSelect = " `fSort` = '" + mArrayType[i] + "'";
+                    } else {
+                        mSelect += " OR `fSort` = '" + mArrayType[i] + "'";
+                    }
+                }
+                Log.d("Test",mSelect);
+                String index_sel = "SELECT DISTINCT fStore from `ai_pomo`.`food` WHERE" + mSelect +
+                        " union SELECT DISTINCT fStore from `ai_pomo`.`food` WHERE " + mSelect +";";
+                String result_sumsel = MySQLConnector.executeQuery(index_sel);
+                Log.d("test",result_sumsel);
+
+                JSONArray jsonArray2 = new JSONArray(result_sumsel);
+
+                setTitle("查詢資料結果");
+
+                for (int i = 0; i < jsonArray2.length(); i++) {
+                    JSONObject jsonData = jsonArray2.getJSONObject(i);
+                    HashMap<String, Object> h2 = new HashMap<String, Object>();
+                    h2.put("gName", jsonData.getString("fStore"));
+
+                    mStoreList.add(h2);
+                    count++;
+                }
+
             }else if(mNumber == 2){
+
+                Log.d("test","mNumber == 2");
+
                 String index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.GPSDistanceAndStoreTimeView AS " +
-                        "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency,GPSDistance from `ai_pomo`.`gps` WHERE round( " + 24.989206 + " ,2) = round(`gY`, 2) AND round(" + 121.313548 + ", 2) = round(`gX`, 2);";
+                        "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency,GPSDistance from `ai_pomo`.`gps` WHERE round( " + mLatitude + " ,2) = round(`gY`, 2) AND round(" + mLongitude + ", 2) = round(`gX`, 2);";
                 MySQLConnector.executeQuery(index_sel);
 
                 index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.StoreDistanceView AS " +
-                        "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency, GPSDistance from `ai_pomo`.`store information` WHERE round( "+ 24.989206 + " ,2) = round(`gY`, 2) AND round(" + 121.313548 + ", 2) = round(`gX`, 2);";
+                        "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency, GPSDistance from `ai_pomo`.`store information` WHERE round( "+ mLatitude + " ,2) = round(`gY`, 2) AND round(" + mLongitude + ", 2) = round(`gX`, 2);";
                 MySQLConnector.executeQuery(index_sel);
 
-                index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView` set `GPSDistance` = round(6378.138*2*asin(sqrt(pow(sin(((`gY`- " + 24.989206 + ")*pi()/180)/2),2)+" +
-                        "cos(`gY`*pi()/180)*cos(" + 24.989206 + "*pi()/180)* pow(sin(((`gX`-" + 121.313548 + ")*pi()/180)/2),2)))*1000);";
+                index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView` set `GPSDistance` = round(6378.138*2*asin(sqrt(pow(sin(((`gY`- " + mLatitude + ")*pi()/180)/2),2)+" +
+                        "cos(`gY`*pi()/180)*cos(" + mLatitude + "*pi()/180)* pow(sin(((`gX`-" + mLongitude + ")*pi()/180)/2),2)))*1000);";
                 MySQLConnector.executeQuery(index_sel);
 
                 index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView` set `gFrequency` = `gFrequency` /`GPSDistance`;";
                 MySQLConnector.executeQuery(index_sel);
 
-                index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `GPSDistance` = round(6378.138*2*asin(sqrt(pow(sin(((`gY`-" + 24.989206 + ")*pi()/180)/2),2)+" +
-                        "cos(`gY`*pi()/180)*cos(" + 24.989206 + "*pi()/180)* pow(sin(((`gX`-" + 121.313548 + ")*pi()/180)/2),2)))*1000);";
+                index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `GPSDistance` = round(6378.138*2*asin(sqrt(pow(sin(((`gY`-" + mLatitude + ")*pi()/180)/2),2)+" +
+                        "cos(`gY`*pi()/180)*cos(" + mLatitude + "*pi()/180)* pow(sin(((`gX`-" + mLongitude + ")*pi()/180)/2),2)))*1000);";
                 MySQLConnector.executeQuery(index_sel);
 
                 index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `gFrequency` = `gFrequency` /`GPSDistance`;";
@@ -279,12 +317,8 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
 
     @Override
     public void onLocationChanged(Location location) {
-        String str = "定位提供者：" + location.getProvider();
         mLatitude = location.getLatitude();
         mLongitude = location.getLongitude();
-        str += String.format("\n緯度:%.5f\n經度:%.5f",
-                mLatitude,
-                mLongitude);
 
     }
 
@@ -370,6 +404,8 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+        mClickStoreData.clear();
 
         AlertDialog.Builder StoreView = new AlertDialog.Builder(this);
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -506,7 +542,15 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
         mHelpEditBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(StoreListActivity.this,EditStoreDataActivity.class);
+                intent.putExtra("gName",mClickStoreData.get(0).get("gName").toString().trim());
+                intent.putExtra("Address",mClickStoreData.get(0).get("Address").toString().trim());
+                intent.putExtra("Description",mClickStoreData.get(0).get("Description").toString().trim());
+                intent.putExtra("gX",mClickStoreData.get(0).get("gX").toString().trim());
+                intent.putExtra("gY",mClickStoreData.get(0).get("gY").toString().trim());
+                intent.putExtra("gOpen",mClickStoreData.get(0).get("gOpen").toString().trim());
+                intent.putExtra("gClose",mClickStoreData.get(0).get("gClose").toString().trim());
+                startActivity(intent);
             }
         });
 
@@ -514,6 +558,11 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
             @Override
             public void onClick(View v) {
 
+                Intent it = new Intent(Intent.ACTION_VIEW);
+                it.setData(Uri.parse("http://maps.google.com/maps?f=d&saddr=" + mClickStoreData.get(0).get("gY").toString() + "," + mClickStoreData.get(0).get("gX").toString() +
+                        "&daddr=" + String.valueOf(mLatitude) + "," + String.valueOf(mLongitude) + "&hl=tw"));
+
+                startActivity(it);
             }
         });
 
@@ -521,10 +570,10 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
         StoreView.setPositiveButton("離開", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //do nothing and close view
+                mClickStoreData.clear();
             }
         });
         StoreView.show();
-        mClickStoreData.clear();
+
     }
 }

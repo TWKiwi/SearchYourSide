@@ -56,6 +56,8 @@ public class FoodListActivity extends ActionBarActivity {
         mFoodAddScoreTxt = (TextView) findViewById(R.id.FoodAddScore);
         mFoodListView = (ListView) findViewById(R.id.FoodList);
 
+        getBundle();
+
         setListView();
         MyFoodAdapter adapter = new MyFoodAdapter(this);
         mFoodListView.setAdapter(adapter);
@@ -71,12 +73,12 @@ public class FoodListActivity extends ActionBarActivity {
 
     private ArrayList<HashMap<String, Object>> setListView(){
 
-        Log.d("test", "setListView");
+        Log.d("test", "setListView" + mStoreName + " " + gX + " " + gY);
 
         try {
 
-            String index_sel = "SELECT fName, fPrice, frequency FROM `ai_pomo`.`food` WHERE `fStore` LIKE '%" + mStoreName + "%' " +
-                    "union SELECT sName, sPrice, sFrequency FROM `ai_pomo`.`store` WHERE `sStore` LIKE '%7-11%' AND `sX` = " + gX +
+            String index_sel = "SELECT fName, fPrice, frequency FROM `ai_pomo`.`food` WHERE `fStore` LIKE '%" + mStoreName.substring(0,3) + "%' " +
+                    "union SELECT sName, sPrice, sFrequency FROM `ai_pomo`.`store` WHERE `sStore` LIKE '%" + mStoreName + "%' AND `sX` = " + gX +
                     " AND `sY` = " + gY + " ORDER BY `frequency` DESC;";
 
 

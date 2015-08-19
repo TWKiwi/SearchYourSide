@@ -15,28 +15,130 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="@string/StoreName"
+            android:text="@string/StoreNameTxt"
             android:textSize="28sp"/>
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
+            android:hint="@string/StoreName"
+            android:id="@+id/newStoreName"/>
+
+    </TableRow>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:hint="@string/StoreAddress"
+        android:id="@+id/newStoreAddress"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:hint="@string/StoreDescription"
+        android:id="@+id/newStoreDescription"/>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:orientation="horizontal">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="4"/>
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/StoreTime"/>
+
+
+        <Spinner
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:id="@+id/OpenHours"
+            android:entries="@array/HoursTime"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:gravity="center"
+            android:textSize="28sp"
+            android:text=":"/>
+
+        <Spinner
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:id="@+id/OpenMinute"
+            android:entries="@array/MinuteTime"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:gravity="center"
+            android:textSize="28sp"
+            android:text="~"/>
+
+        <Spinner
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:id="@+id/CloseHours"
+            android:entries="@array/HoursTime"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:gravity="center"
+            android:textSize="28sp"
+            android:text=":"/>
+
+        <Spinner
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:id="@+id/CloseMinute"
+            android:entries="@array/MinuteTime"/>
 
         </TableRow>
 
-    <TableRow
+    <EditText
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"></TableRow>
+        android:layout_weight="1"
+        android:hint="@string/StoreRemarkNote"
+        android:id="@+id/newStoreRemarkNote"/>
 
     <TableRow
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"></TableRow>
+        android:layout_weight="1"
+        android:orientation="horizontal">
 
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"></TableRow>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/StoreEditBtn"
+            android:id="@+id/StoreEditBtn"/>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/EditCancelBtn"
+            android:id="@+id/EditCancelBtn"/>
+
+
+    </TableRow>
 </LinearLayout>

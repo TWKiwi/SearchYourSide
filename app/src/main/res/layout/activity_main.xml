@@ -33,7 +33,7 @@
         android:background="#2894FF"
         android:gravity="center"
         android:id="@+id/smartButlerBtn"
-        android:text="@string/smartBulterBtn" />
+        android:text="@string/smartButlerBtn" />
 
     <Button
         android:layout_width="fill_parent"
