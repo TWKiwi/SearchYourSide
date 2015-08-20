@@ -87,6 +87,9 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
     }
 
     private void initView(){
+
+
+
         this.setTitle("查詢資料結果");
         mStoreListView = (ListView)findViewById(R.id.StoreList);
         mStoreListView.setOnItemClickListener(this);
@@ -160,7 +163,7 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
 
 //        if(whatBtn.equals("isProposal")){
 
-
+        mStoreList.clear();
 
         try {
             int count = 0;
