@@ -8,6 +8,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -159,7 +160,7 @@ public class SmartButlerActivity extends ActionBarActivity implements View.OnCli
                     startActivity(intent);
                     mShowTxt.setText(mEditText.getText());
 
-                }else if(mShowTxt.length() > 0){
+                }else if(mCheckNum > 0){
                     int num = 0;
                     for(int i = 0; i < mItemList.size(); i++){
                         if(MyAdapter.getIsSelected().get(i)){
@@ -187,7 +188,6 @@ public class SmartButlerActivity extends ActionBarActivity implements View.OnCli
 
                 }
                 dataChanged();
-                mShowTxt.setText("");
                 break;
 
         }

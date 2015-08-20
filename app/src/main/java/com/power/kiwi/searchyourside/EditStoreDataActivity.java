@@ -1,18 +1,20 @@
 package com.power.kiwi.searchyourside;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 
-
-public class EditStoreDataActivity extends ActionBarActivity implements View.OnClickListener {
+public class EditStoreDataActivity extends ActionBarActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener {
 
     EditText mNewStoreName,mNewStoreAddress,mNewStoreDescription,mNewStoreRemarkNote;
     Button mStoreEditBtn,mEditCancelBtn;
@@ -44,6 +46,10 @@ public class EditStoreDataActivity extends ActionBarActivity implements View.OnC
         mOpenMinuteSpn = (Spinner) findViewById(R.id.OpenMinute);
         mCloseHouseSpn = (Spinner) findViewById(R.id.CloseHours);
         mCloseMinuteSpn = (Spinner) findViewById(R.id.CloseMinute);
+        mOpenHouseSpn.setOnItemSelectedListener(this);
+        mOpenMinuteSpn.setOnItemSelectedListener(this);
+        mCloseHouseSpn.setOnItemSelectedListener(this);
+        mCloseMinuteSpn.setOnItemSelectedListener(this);
 
         Intent intent = getIntent();
         mNewStoreName.setText(intent.getStringExtra("gName"));
@@ -97,5 +103,22 @@ public class EditStoreDataActivity extends ActionBarActivity implements View.OnC
                 this.finish();
                 break;
         }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        TextView mSpinnerTextColor = (TextView)mOpenHouseSpn.getChildAt(0);
+        mSpinnerTextColor.setTextColor(Color.WHITE);
+        mSpinnerTextColor = (TextView)mOpenMinuteSpn.getChildAt(0);
+        mSpinnerTextColor.setTextColor(Color.WHITE);
+        mSpinnerTextColor = (TextView)mCloseHouseSpn.getChildAt(0);
+        mSpinnerTextColor.setTextColor(Color.WHITE);
+        mSpinnerTextColor = (TextView)mCloseMinuteSpn.getChildAt(0);
+        mSpinnerTextColor.setTextColor(Color.WHITE);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }

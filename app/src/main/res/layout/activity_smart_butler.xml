@@ -8,7 +8,7 @@
     <TableRow
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="0.6">
 
         <TextView
             android:layout_width="0dp"
@@ -25,7 +25,8 @@
             android:layout_weight="3"
             android:gravity="center"
             android:id="@+id/SearchFoodEdit"
-            android:background="#FFFFFF"/>
+            android:background="#FFFFFF"
+            android:textColor="#000000"/>
 
 
         </TableRow>
@@ -46,7 +47,7 @@
             android:id="@+id/line"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_weight="0.5">
 
             <Button
                 android:id="@+id/SelectAllBtn"

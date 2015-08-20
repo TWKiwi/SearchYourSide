@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -24,7 +25,8 @@ import java.util.HashMap;
 
 
 public class FoodListActivity extends ActionBarActivity {
-    private TextView mFoodName,mFoodPrice, mFoodAddScoreTxt;
+    private TextView mFoodName,mFoodPrice;
+    private Button mFoodAddScoreTxt;
     private ListView mFoodListView;
     private String mStoreName,gX,gY;
     private ArrayList<HashMap<String, Object>> mFoodList = new ArrayList<HashMap<String, Object>>();
@@ -53,7 +55,6 @@ public class FoodListActivity extends ActionBarActivity {
     private void initView(){
         mFoodName = (TextView) findViewById(R.id.FoodNameTxt);
         mFoodPrice = (TextView) findViewById(R.id.FoodPriceTxt);
-        mFoodAddScoreTxt = (TextView) findViewById(R.id.FoodAddScore);
         mFoodListView = (ListView) findViewById(R.id.FoodList);
 
         getBundle();
@@ -133,7 +134,7 @@ public class FoodListActivity extends ActionBarActivity {
 
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
-            if(convertView == null)convertView = mInflater.inflate(R.layout.activity_food_list,null);
+            if(convertView == null)convertView = mInflater.inflate(R.layout.food_list_object,null);
 
 //            final ImageView StoreListImage = (ImageView)convertView.findViewById(R.id.StoreListImage);
 //            byte[] decodedString = Base64.decode(mStoreList.get(position).get("gPic").toString(), Base64.DEFAULT);
@@ -147,7 +148,7 @@ public class FoodListActivity extends ActionBarActivity {
             mFoodName.setText(mFoodList.get(position).get("fName").toString());
             mFoodPrice = (TextView)convertView.findViewById(R.id.FoodPriceTxt);
             mFoodPrice.setText(mFoodList.get(position).get("fPrice").toString());
-            mFoodAddScoreTxt = (TextView)convertView.findViewById(R.id.FoodAddScore);
+            mFoodAddScoreTxt = (Button)convertView.findViewById(R.id.FoodAddScore);
             mFoodAddScoreTxt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

@@ -1,15 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#49494A"
-    android:orientation="vertical"
-    tools:context="com.power.kiwi.searchyourside.FoodListActivity">
+    android:layout_width="match_parent" android:layout_height="match_parent">
 
-    <LinearLayout
+    <TableRow
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal">
+        android:layout_height="60sp">
 
         <TextView
             android:layout_width="0dp"
@@ -18,7 +13,7 @@
             android:id="@+id/FoodNameTxt"
             android:gravity="center"
             android:text="@string/FoodNameTxt"
-            android:textSize="24sp"
+            android:textSize="18sp"
             android:textColor="#ffffff"/>
 
         <TextView
@@ -28,27 +23,21 @@
             android:id="@+id/FoodPriceTxt"
             android:gravity="center"
             android:text="@string/FoodPriceTxt"
-            android:textSize="21sp"
+            android:textSize="16sp"
             android:textColor="#ffffff"/>
 
-        <TextView
+        <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="0.6"
             android:id="@+id/FoodAddScore"
             android:gravity="center"
-            android:text="@string/FoodAddScore"
-            android:textSize="18sp"
-            android:textColor="#ffffff"/>
+            android:textSize="12sp"
+            android:textColor="#ffffff"
+            android:background="@drawable/like"/>
 
-    </LinearLayout>
+        </TableRow>
 
-
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="9"
-        android:id="@+id/FoodList"/>
 
 
 </LinearLayout>

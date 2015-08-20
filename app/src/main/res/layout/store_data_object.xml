@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#49494A">
 
     <TableRow
         android:layout_width="match_parent"
@@ -12,34 +13,38 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/storeNameTxt"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:textSize="28sp"
+            android:textColor="#ffffff"/>
 
-        </TableRow>
+    </TableRow>
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
-        android:id="@+id/storeImage"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"
+        android:layout_weight="4"
         android:id="@+id/storeDataTxt"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:textColor="#ffffff"
+        android:background="#555555"/>
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:text="@string/SearchFoodBtn"
-        android:id="@+id/SearchFoodBtn"/>
+        android:id="@+id/SearchFoodBtn"
+        android:textSize="32sp"
+        android:layout_margin="5sp"
+        android:textColor="#ffffff"
+        android:background="#777777"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:layout_margin="5sp"
         android:orientation="horizontal">
 
         <Button
@@ -47,14 +52,21 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/HelpEditBtn"
-            android:id="@+id/HelpEditBtn"/>
+            android:id="@+id/HelpEditBtn"
+            android:textSize="28sp"
+            android:textColor="#ffffff"
+            android:background="#777777"/>
 
         <Button
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/GPSBtn"
-            android:id="@+id/GPSGoBtn"/>
+            android:id="@+id/GPSGoBtn"
+            android:textSize="28sp"
+            android:layout_marginLeft="10sp"
+            android:textColor="#ffffff"
+            android:background="#777777"/>
 
         </LinearLayout>
 

@@ -27,7 +27,9 @@
             android:layout_weight="3"
             android:layout_gravity="center"
             android:id="@+id/setBudgetEdt"
-            android:textSize="28sp"/>
+            android:textSize="28sp"
+            android:textColor="#ffffff"
+            android:inputType="number"/>
 
         </TableRow>
 
@@ -52,7 +54,9 @@
             android:layout_weight="3"
             android:layout_gravity="center"
             android:id="@+id/setRglCostEdt"
-            android:textSize="28sp"/>
+            android:textSize="28sp"
+            android:textColor="#ffffff"
+            android:inputType="number"/>
 
         </TableRow>
 
@@ -60,14 +64,17 @@
     <TableRow
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:layout_margin="2.5sp">
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/setOptionsBtn"
             android:textSize="28sp"
-            android:text="@string/setOptionsBtn"/>
+            android:text="@string/setOptionsBtn"
+            android:textColor="#ffffff"
+            android:background="#777777"/>
 
 
         </TableRow>
@@ -75,28 +82,34 @@
     <TableRow
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:layout_margin="2.5sp">
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/setGpsBtn"
             android:text="@string/setGpsBtn"
-            android:textSize="28sp"/>
+            android:textSize="28sp"
+            android:textColor="#ffffff"
+            android:background="#777777"/>
 
         </TableRow>
 
     <TableRow
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:layout_margin="2.5sp">
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/aboutUsBtn"
             android:text="@string/aboutUsBtn"
-            android:textSize="28sp"/>
+            android:textSize="28sp"
+            android:textColor="#ffffff"
+            android:background="#777777"/>
         </TableRow>
 
 

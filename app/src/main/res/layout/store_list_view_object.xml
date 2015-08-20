@@ -12,8 +12,7 @@
             android:layout_gravity="center"
             android:id="@+id/StoreListImage"
             android:layout_weight="1"
-            android:textColor="#0000E3"
-            android:background="#ACD6FF"/>
+            android:background="#555555"/>
 
         <TextView
             android:layout_width="0dp"
@@ -24,8 +23,8 @@
             android:text=""
             android:id="@+id/StoreListStoreText"
             android:layout_weight="2"
-            android:textColor="#0000E3"
-            android:background="#ACD6FF"/>
+            android:textColor="#ffffff"
+            android:background="#555555"/>
 
         <TextView
             android:layout_width="0dp"
@@ -36,8 +35,8 @@
             android:text=""
             android:id="@+id/StoreListDistanceText"
             android:layout_weight="2"
-            android:textColor="#0000E3"
-            android:background="#ACD6FF"/>
+            android:textColor="#ffffff"
+            android:background="#555555"/>
 
     </TableRow>
 

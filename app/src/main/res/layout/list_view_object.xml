@@ -19,7 +19,8 @@
             android:id="@+id/ChargeListTxt"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="4"/>
+            android:layout_weight="4"
+            android:textColor="#ffffff"/>
 
         <Button
             android:id="@+id/DeleteBtn"
@@ -27,7 +28,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/DeleteBtn"
-            android:textSize="12sp"/>
+            android:textSize="12sp"
+            android:textColor="#ffffff"/>
 
     </TableRow>
 

@@ -29,6 +29,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
@@ -75,6 +76,8 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
     private ViewPager mViewPager;//畫面
 
     public static List<String> mPageTittle;//畫面標題
+
+    private static CameraView mCameraView = new CameraView();
 
     private static CalendarSearchView mCalendarSearchView = new CalendarSearchView();
 
@@ -135,7 +138,9 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
                 // We can also use ActionBar.Tab#select() to do this if we have a reference to the
                 // Tab.
                 actionBar.setSelectedNavigationItem(position);
-                if(position == 1){
+                if(position == 0){
+                    mCameraView.initView();
+                }else if(position == 1){
                     mCalendarSearchView.setData();
                 }else if(position == 2){
                     mBarChartView.initView();
@@ -270,7 +275,7 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
         public Fragment getItem(int i) {
             switch (i) {
                 case 0:
-                    return new CameraView();
+                    return mCameraView;
                 case 1:
                     return mCalendarSearchView;
                 default:
@@ -292,19 +297,18 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
     /**
      * 初始化拍照記帳畫面
      */
-    public static class CameraView extends Fragment implements View.OnClickListener {
-        private View mRootView;
+    public static class CameraView extends Fragment implements View.OnClickListener,AdapterView.OnItemSelectedListener {
+        private View CameraView;
         private Button mTakePicBtn, mAddBtn;//拍照按鈕與入帳按鈕
         private ImageView mImageView;
         private LazyChargeActivity mLazyChargeActivity = new LazyChargeActivity();
-        private CalendarSearchView mCalendarSearchView = new CalendarSearchView();
         private EditText mItemName, mItemPrice;
         private Spinner mItemType;
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            mRootView = inflater.inflate(R.layout.camera_view, container, false);
+            CameraView = inflater.inflate(R.layout.camera_view, container, false);
 
             initView();
 
@@ -314,47 +318,21 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
                 mDirFile.mkdirs();
 
             }
-
-//            // Demonstration of a collection-browsing activity.
-//            mRootView.findViewById(R.id.takePicBtn)
-//                    .setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View view) {
-//                            Intent intent = new Intent(getActivity(), CollectionDemoActivity.class);
-//                            startActivity(intent);
-//                        }
-//                    });
-//
-//            // Demonstration of navigating to external activities.
-//            mRootView.findViewById(R.id.addDataBtn)
-//                    .setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View view) {
-//                            // Create an intent that asks the user to pick a photo, but using
-//                            // FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET, ensures that relaunching
-//                            // the application from the device home screen does not return
-//                            // to the external activity.
-//                            Intent externalActivityIntent = new Intent(Intent.ACTION_PICK);
-//                            externalActivityIntent.setType("image/*");
-//                            externalActivityIntent.addFlags(
-//                                    Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-//                            startActivity(externalActivityIntent);
-//                        }
-//                    });
             setListener();
-            return mRootView;
+            return CameraView;
         }
 
         /**
          * 初始化View物件
          */
         private void initView() {
-            mTakePicBtn = (Button) mRootView.findViewById(R.id.takePicBtn);
-            mAddBtn = (Button) mRootView.findViewById(R.id.addDataBtn);
-            mImageView = (ImageView) mRootView.findViewById(R.id.PicImageView);
-            mItemName = (EditText) mRootView.findViewById(R.id.ItemName);
-            mItemType = (Spinner) mRootView.findViewById(R.id.ItemType);
-            mItemPrice = (EditText) mRootView.findViewById(R.id.ItemPrice);
+            mTakePicBtn = (Button) CameraView.findViewById(R.id.takePicBtn);
+            mAddBtn = (Button) CameraView.findViewById(R.id.addDataBtn);
+            mImageView = (ImageView) CameraView.findViewById(R.id.PicImageView);
+            mItemName = (EditText) CameraView.findViewById(R.id.ItemName);
+            mItemType = (Spinner) CameraView.findViewById(R.id.ItemType);
+            mItemPrice = (EditText) CameraView.findViewById(R.id.ItemPrice);
+
         }
 
         /**
@@ -364,6 +342,7 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
 
             mTakePicBtn.setOnClickListener(this);
             mAddBtn.setOnClickListener(this);
+            mItemType.setOnItemSelectedListener(this);
         }
 
         /**
@@ -503,6 +482,19 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
 
 
         }
+
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//            mItemType = (Spinner) CameraView.findViewById(R.id.ItemType);
+//            TextView mSpinnerTextColor = (TextView)mItemType.getChildAt(0);
+//            Log.d("test",mSpinnerTextColor.getText().toString());
+//            mSpinnerTextColor.setTextColor(Color.WHITE);
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
     }
 
     /**
@@ -513,7 +505,7 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
         private LazyChargeActivity mLazyChargeActivity = new LazyChargeActivity();
         private MyAdapter mAdapter;
 
-        private View rootView;
+        private View CalendarSearchView;
         private CalendarView mCalendarView;
         private ListView mListView;
 
@@ -534,22 +526,31 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            rootView = inflater.inflate(R.layout.calendar_view, container, false);
+            CalendarSearchView = inflater.inflate(R.layout.calendar_view, container, false);
 
             initView();
             Log.d("Text","onCreateView");
-            return rootView;
+            return CalendarSearchView;
         }
 
         /**
          * 初始化View元件
          */
         private void initView() {
-            mCalendarView = (CalendarView) rootView.findViewById(R.id.CalendarView);
+            mCalendarView = (CalendarView) CalendarSearchView.findViewById(R.id.CalendarView);
             mDate = mCalendarView.getDate();
             mCalendarView.setOnDateChangeListener(this);
 
-            mListView = (ListView) rootView.findViewById(R.id.listView);
+            //改變月曆年月顏色
+            ViewGroup vg = (ViewGroup) mCalendarView.getChildAt(0);
+            View child = vg.getChildAt(0);
+
+            if(child instanceof TextView) {
+                ((TextView)child).setTextColor(Color.WHITE);
+            }
+
+
+            mListView = (ListView) CalendarSearchView.findViewById(R.id.listView);
             mItemList = getData(new SimpleDateFormat("yyyyMMdd").format(new Date()));
             mAdapter = new MyAdapter(getActivity());
             mListView.setAdapter(mAdapter);
@@ -709,7 +710,7 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
      * 初始化圖表畫面
      */
     public static class BarChartView extends Fragment {
-        View rootView, mView;
+        View BarCharView, mView;
         LazyChargeActivity mLazyChargeActivity = new LazyChargeActivity();
         TextView ScaleNumM, ScaleNumD;
         Button ScaleBtn;
@@ -721,20 +722,20 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            rootView = inflater.inflate(R.layout.bar_chart_view, container, false);
+            BarCharView = inflater.inflate(R.layout.bar_chart_view, container, false);
             mBudget = mOptionsActivity.getData("mBudget");
             mRglCost = mOptionsActivity.getData("mRglCost");
             mScaleTS = mOptionsActivity.getData("mScaleTS");
             initView();
 
-            return rootView;
+            return BarCharView;
         }
 
         private void initView(){
 
-            ScaleNumM = (TextView) rootView.findViewById(R.id.showScaleNumM);
-            ScaleNumD = (TextView) rootView.findViewById(R.id.showScaleNumD);
-//            ScaleBtn = (Button) rootView.findViewById(R.id.MD_ScaleBtn);
+            ScaleNumM = (TextView) BarCharView.findViewById(R.id.showScaleNumM);
+            ScaleNumD = (TextView) BarCharView.findViewById(R.id.showScaleNumD);
+//            ScaleBtn = (Button) BarCharView.findViewById(R.id.MD_ScaleBtn);
             getMBarChart();
             getDBarChart();
 
@@ -746,7 +747,7 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
             List< double []> values = new ArrayList<>();
             values.add( new  double [] {100});
             values.add( new  double [] {percent});
-            int [] colors = new  int [] { Color.parseColor("#46A3FF"), Color.parseColor("#2828FF")};
+            int [] colors = new  int [] { Color.parseColor("#FFFFFF"), Color.parseColor("#23B6F6")};
             XYMultipleSeriesRenderer renderer = buildBarRenderer(colors);//長條圖顏色設置
             renderer.setOrientation(XYMultipleSeriesRenderer.Orientation.VERTICAL);
             /**設置圖形renderer,標題,橫軸,縱軸,橫軸最小值,橫軸最大值,縱軸最大值,縱軸最小值,設定軸寬,設定軸色,標籤顏色*/
@@ -756,7 +757,7 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
             renderer.setXLabels(0);//設置x軸標籤數  0為不顯示文字 程式設定文字
             renderer.setYLabels(5);//設置y軸標籤數
             renderer.setXLabelsAlign(Paint.Align.CENTER);//設置x軸標籤置中
-            renderer.setYLabelsAlign(Paint.Align.RIGHT);//設置y軸標籤置中
+            renderer.setYLabelsAlign(Paint.Align.RIGHT);//設置y軸標籤置右
             renderer.setYLabelsColor(0, Color.WHITE);//設置y軸標籤顏色
             renderer.setPanEnabled(false, false);//圖表移動  If you want to lock both axis, then use renderer.setPanEnabled(false, false);
             renderer.setZoomEnabled(false, false);//圖表縮放(x軸,y軸)
@@ -776,42 +777,12 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
 
         public void getMBarChart(){
 
-            FrameLayout scale_MView = (FrameLayout) rootView.findViewById(R.id.scaleMView);
+            FrameLayout scale_MView = (FrameLayout) BarCharView.findViewById(R.id.scaleMView);
             scale_MView.removeAllViews();
             long percentMonth = scaleComputeOfMonth();
 
-
-//        if(ScaleBtn.getText().equals("切換開銷類別瀏覽"))
             scale_MView.addView(getVBarChartView(percentMonth));
-//        else if(ScaleBtn.getText().equals("切換月/日總開銷瀏覽")) {
-//
-//            Cursor cursor = mLazyChargeActivity.getCursor();
-//            String select_month = new SimpleDateFormat("yyyyMMdd").format(new Date());
-//            int sum = 0;
-//            while (cursor.moveToNext()){
-//                if(cursor.getString(1).substring(0,6).equals(select_month.substring(0,6))){
-//
-//                    sum += Integer.parseInt(cursor.getString(4));
-//
-//                }
-//            }
-//
-//            Long percent = ((sum + mRglCost))*100 / mBudget;//算百分比條小數點弄成百分比整數
-//            if(percent <= 100) {
-//                if(mScaleTS == 0) {
-//                    ScaleNumM.setText(Html.fromHtml("累計花費(月)<br>" + ((sum + mRglCost) + "<font color = '#FFFFFF'><big>/</font>" + mBudget + "元")));
-//                }else if(mScaleTS == 1){
-//                    ScaleNumM.setText(Html.fromHtml("剩餘預算(月)<br>" + ((mBudget - (sum + mRglCost)) + "<font color = '#FFFFFF'><big>/</font>" + mBudget + "元")));
-//                }else{
-//                    ScaleNumM.setText(mScaleTS);
-//                }
-//            }else if(percent > 100){
-//                ScaleNumM.setText(Html.fromHtml("本月" + "<font color = '#FFFFFF'><big>超支<br></font>" + ((sum + mRglCost) - mBudget)+ "元"));
-//                percent = 100L;
-//            }
-//            scale_MView.addView(getHBarChartView(sum,"Month"));
-//
-//        }
+
 
         }
 
@@ -825,8 +796,7 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
                     sum += Double.parseDouble(cursor.getString(4));
                 }
             }
-            //        SharedPreferences option = getPreferences(MODE_PRIVATE);
-            //        mBudget = option.getInt("mBudget",20000);
+
             Long percent = ((sum + mRglCost) * 100)/ mBudget;//算百分比條小數點弄成百分比整數
             if(percent <= 100) {
                 if(mScaleTS == 0) {
@@ -850,38 +820,11 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
 
         public void getDBarChart(){
 
-            FrameLayout scale_DView = (FrameLayout) rootView.findViewById(R.id.scaleDView);
+            FrameLayout scale_DView = (FrameLayout) BarCharView.findViewById(R.id.scaleDView);
             scale_DView.removeAllViews();
             long persentDay = scaleComputeOfDay();
 
-//        if(ScaleBtn.getText().equals("切換開銷類別瀏覽"))
             scale_DView.addView(getVBarChartView(persentDay));
-//        else if(ScaleBtn.getText().equals("切換月/日總開銷瀏覽")) {
-//
-//            Cursor cursor = mLazyChargeActivity.getCursor();
-//            String select_month = new SimpleDateFormat("yyyyMMdd").format(new Date());
-//            int sum = 0;
-//            while (cursor.moveToNext()){
-//                if(cursor.getString(1).substring(0,8).equals(select_month.substring(0,8))){
-//                    sum += Integer.parseInt(cursor.getString(4));
-//                }
-//            }
-//
-//            Long percent = ((sum + mRglCost / 30)*100) / (mBudget / 30);//算百分比條小數點弄成百分比整數
-//            if(percent <= 100) {
-//                if(mScaleTS == 0) {
-//                    ScaleNumD.setText(Html.fromHtml("累計花費(日)<br>" + (sum + mRglCost / 30) + "<font color = '#FFFFFF'><big>/</font>" + (mBudget / 30) + "元"));
-//                }else if(mScaleTS == 1){
-//                    ScaleNumD.setText(Html.fromHtml("剩餘預算(日)<br>" + ((mBudget / 30) - (sum + mRglCost / 30) + "<font color = '#FFFFFF'><big>/</font>" + (mBudget / 30) + "元")));
-//                }else{
-//                    ScaleNumM.setText(mScaleTS);
-//                }
-//            }else if(percent > 100){
-//                ScaleNumD.setText(Html.fromHtml("本日" + "<font color = '#FFFFFF'><big>超支<br></font>" + ((sum + mRglCost / 30 - mBudget / 30)) + "元"));
-//                percent = 100L;
-//            }
-//            scale_DView.addView(getHBarChartView(sum,"Day"));
-//        }
 
         }
 

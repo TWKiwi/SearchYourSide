@@ -15,7 +15,7 @@
             android:layout_weight="1"
             android:textSize="18sp"
             android:gravity="center"
-            android:textColor="#2828FF"
+            android:textColor="#ffffff"
             android:text="New Text"
             android:id="@+id/showScaleNumM"/>
 
@@ -51,7 +51,7 @@
             android:layout_weight="1"
             android:textSize="18sp"
             android:gravity="center"
-            android:textColor="#2828FF"
+            android:textColor="#ffffff"
             android:text="New Text"
             android:id="@+id/showScaleNumD"/>
 

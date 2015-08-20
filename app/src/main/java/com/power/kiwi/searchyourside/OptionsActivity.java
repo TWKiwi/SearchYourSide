@@ -110,9 +110,10 @@ public class OptionsActivity extends ActionBarActivity implements View.OnClickLi
             case "mBudget" : return optionSpr.getLong("mBudget", 18000);
             case "mRglCost" : return optionSpr.getLong("mRglCost", 0);
             case "mScaleTS" : return optionSpr.getLong("mScaleTS", 0);
-            case "飯" : return optionSpr.getLong("飯", 0);
-            case "粥" : return optionSpr.getLong("粥", 0);
-            case "麵" : return optionSpr.getLong("麵", 0);
+            case "飯類" : return optionSpr.getLong("飯類", 0);
+            case "粥類" : return optionSpr.getLong("粥類", 0);
+            case "麵類" : return optionSpr.getLong("麵類", 0);
+            case "油炸類" : return optionSpr.getLong("油炸類", 0);
             case "中式" : return optionSpr.getLong("中式", 0);
             case "西式" : return optionSpr.getLong("西式", 0);
             case "點心" : return optionSpr.getLong("點心", 0);
@@ -130,10 +131,10 @@ public class OptionsActivity extends ActionBarActivity implements View.OnClickLi
     public String hashMapSort(){
 
         HashMap<String,Long> hashMap = new HashMap<>();
-        hashMap.put("飯",getData("飯"));
-        hashMap.put("粥",getData("粥"));
-        hashMap.put("麵",getData("麵"));
-        hashMap.put("油炸",getData("油炸"));
+        hashMap.put("飯類",getData("飯類"));
+        hashMap.put("粥類",getData("粥類"));
+        hashMap.put("麵類",getData("麵類"));
+        hashMap.put("油炸類",getData("油炸類"));
         hashMap.put("中式",getData("中式"));
         hashMap.put("西式",getData("西式"));
         hashMap.put("點心",getData("點心"));

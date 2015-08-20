@@ -66,7 +66,8 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_store_list);
-
+        this.setTitle("等候衛星定位...");
+        mLocationManager = (LocationManager)getSystemService(LOCATION_SERVICE);
 
         //連線
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
@@ -82,12 +83,11 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
                 .build());
         //連線
 
-        initView();
 
     }
 
     private void initView(){
-        mLocationManager = (LocationManager)getSystemService(LOCATION_SERVICE);
+        this.setTitle("查詢資料結果");
         mStoreListView = (ListView)findViewById(R.id.StoreList);
         mStoreListView.setOnItemClickListener(this);
 
@@ -109,7 +109,7 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
         mArrayType = intent.getStringArrayExtra("arrayType");
         mNumber = intent.getIntExtra("Number",2);
 
-        Log.d("Test", mInputType + "\n" + mTime + "\n" + mName + "\n" + mType + "\n" + mArrayType[1] + "\n" + mNumber);
+        Log.d("Test", mInputType + "\n" + mTime + "\n" + mName + "\n" + mType + "\n" +  mNumber);
     }
 
     private ArrayList<HashMap<String, Object>> setListView(){
@@ -174,15 +174,15 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
                          "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency, GPSDistance from `ai_pomo`.`store information` where `gName` like '%" + mName + "%';";
                 MySQLConnector.executeQuery(index_sel);
 
-                index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView` set `GPSDistance` = round(6378.138*2*asin(sqrt(pow(sin(((`gY`-24.801643)*pi()/180)/2),2)+" +
-                        "cos(`gY`*pi()/180)*cos(24.801643*pi()/180)* pow(sin(((`gX`-120.971695)*pi()/180)/2),2)))*1000);";
+                index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView` set `GPSDistance` = round(6378.138*2*asin(sqrt(pow(sin(((`gY`-" + mLatitude + ")*pi()/180)/2),2)+" +
+                        "cos(`gY`*pi()/180)*cos(" + mLatitude + "*pi()/180)* pow(sin(((`gX`-" + mLongitude + ")*pi()/180)/2),2)))*1000);";
                 MySQLConnector.executeQuery(index_sel);
 
                 index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView` set `gFrequency` = `gFrequency` /`GPSDistance`;";
                 MySQLConnector.executeQuery(index_sel);
 
-                index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `GPSDistance` = round(6378.138*2*asin(sqrt(pow(sin(((`gY`-24.801643)*pi()/180)/2),2)+" +
-                        "cos(`gY`*pi()/180)*cos(24.801643*pi()/180)* pow(sin(((`gX`-120.971695)*pi()/180)/2),2)))*1000);";
+                index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `GPSDistance` = round(6378.138*2*asin(sqrt(pow(sin(((`gY`-" + mLatitude + ")*pi()/180)/2),2)+" +
+                        "cos(`gY`*pi()/180)*cos(" + mLatitude + "*pi()/180)* pow(sin(((`gX`-" + mLongitude + ")*pi()/180)/2),2)))*1000);";
                 MySQLConnector.executeQuery(index_sel);
 
                 index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `gFrequency` = `gFrequency` /`GPSDistance`;";
@@ -190,7 +190,7 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
 
                 index_sel = "SELECT gId,gName,gOpen, gClose, gFrequency, GPSDistance from `ai_pomo`.`GPSDistanceAndStoreTimeView` where `gOpen` < " + mTime + " OR `gClose`>" + mTime +
                            " union " +
-                           "SELECT gId,gName,gOpen, gClose, gFrequency, GPSDistance from `ai_pomo`.`StoreDistanceView` where `gOpen` < " + mTime + " OR `gClose`> " + mTime + " ORDER BY `gFrequency` DESC, `GPSDistance` ASC ;";
+                           "SELECT gId,gName,gOpen, gClose, gFrequency, GPSDistance from `ai_pomo`.`StoreDistanceView` where `gOpen` < " + mTime + " OR `gClose`> " + mTime + " ORDER BY `GPSDistance` ASC, `gFrequency` DESC;";
                 String result_sumsel = MySQLConnector.executeQuery(index_sel);
 
                 Log.d("test",result_sumsel);
@@ -212,29 +212,109 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
             }else if (mNumber == 1){
 
                 Log.d("test","mNumber == 1 " + mArrayType.length);
-                String mSelect = "";
-                for (int i = 0; mArrayType.length > i ; i++){
-                    if(mArrayType[i] == null) break;
-                    if(mSelect.equals("")){
-                        mSelect = " `fSort` = '" + mArrayType[i] + "'";
-                    } else {
-                        mSelect += " OR `fSort` = '" + mArrayType[i] + "'";
-                    }
-                }
-                Log.d("Test",mSelect);
-                String index_sel = "SELECT DISTINCT fStore from `ai_pomo`.`food` WHERE" + mSelect +
-                        " union SELECT DISTINCT fStore from `ai_pomo`.`food` WHERE " + mSelect +";";
+
+                String index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.GPSDistanceAndStoreTimeView AS " +
+                        "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency, gRank, GPSDistance from `ai_pomo`.`gps` where round(" + mLatitude + ",1) = round(`gY`, 1) AND " +
+                        "round(" + mLongitude + ",2) = round(`gX`, 2) order by `GPSDistance` ASC;";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.StoreDistanceView AS " +
+                        "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency, gRank, GPSDistance from `ai_pomo`.`store information` where round(" + mLatitude + ",1) = round(`gY`, 2) AND " +
+                        "round(" + mLongitude + ",2) = round(`gX`, 2);";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView` set `GPSDistance` = " +
+                        "round(6378.138*2*asin(sqrt(pow(sin(((`gY`-" + mLatitude + ")*pi()/180)/2),2)+cos(`gY`*pi()/180)*cos(" + mLatitude + "*pi()/180)* pow(sin(((`gX`-" + mLongitude + ")*pi()/180)/2),2)))*1000);";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView` set `gFrequency` = `gFrequency` /`GPSDistance`;";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `GPSDistance` = " +
+                        "round(6378.138*2*asin(sqrt(pow(sin(((`gY`-" + mLatitude + ")*pi()/180)/2),2)+cos(`gY`*pi()/180)*cos(" + mLatitude + "*pi()/180)* pow(sin(((`gX`-" + mLongitude + ")*pi()/180)/2),2)))*1000);";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `gFrequency` = `gFrequency` /`GPSDistance`;";
+                MySQLConnector.executeQuery(index_sel);
+
+                int i = 0;
+
+                    do{
+
+                        index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.StoreTypeView AS " +
+                                "SELECT * from `ai_pomo`.`food` WHERE `fSort` = '" + mArrayType[i] + "';";
+                        MySQLConnector.executeQuery(index_sel);
+
+                        index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.StoreTypeView2 AS " +
+                                "SELECT DISTINCT gName, gOpen, gClose,gX, gY, gFrequency, gRank, GPSDistance FROM `ai_pomo`.`GPSDistanceAndStoreTimeView`, `ai_pomo`.`StoreTypeView` where SUBSTRING_INDEX(`GPSDistanceAndStoreTimeView`.`gName`, ' ', 1) = " +
+                                "`StoreTypeView`.`fStore` order by `GPSDistance` ASC;";
+                        MySQLConnector.executeQuery(index_sel);
+
+                        index_sel = "update `ai_pomo`.`gps`, `ai_pomo`.`StoreTypeView2` set `gps`.`gRank` =" +
+                                " `gps`.`gRank` + 1 +round(`gps`.`gFrequency`/ 6378.138*2*asin(sqrt(pow(sin(((`gps`.`gY`-" + mLatitude + ")*pi()/180)/2),2)+" +
+                                "cos(`gps`.`gY`*pi()/180)*cos(" + mLatitude + "*pi()/180)* pow(sin(((`gps`.`gX`-" + mLongitude + ")*pi()/180)/2),2)))*10000)where `gps`.`gName` = `StoreTypeView2`.`gName`;";
+                        MySQLConnector.executeQuery(index_sel);
+
+                        index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.GPSDistanceAndStoreTimeView AS " +
+                                "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency, gRank, GPSDistance from `ai_pomo`.`gps` where round(" + mLatitude + ",1) = round(`gY`, 1) AND round(" + mLongitude + ",2) = round(`gX`, 2) order by `GPSDistance` ASC;";
+                        MySQLConnector.executeQuery(index_sel);
+
+                        index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView` set `GPSDistance` = " +
+                                "round(6378.138*2*asin(sqrt(pow(sin(((`gY`-" + mLatitude + ")*pi()/180)/2),2)+cos(`gY`*pi()/180)*cos(" + mLatitude + "*pi()/180)* pow(sin(((`gX`-" + mLongitude + ")*pi()/180)/2),2)))*1000);";
+                        MySQLConnector.executeQuery(index_sel);
+
+                        index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.StoreTypeView3 AS " +
+                                "SELECT * from `ai_pomo`.`store` WHERE `fSort` = '" + mArrayType[i] + "';";
+                        MySQLConnector.executeQuery(index_sel);
+
+                        index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.StoreTypeView4 AS " +
+                                "SELECT DISTINCT gName, gOpen, gClose,gX, gY, gFrequency, gRank, GPSDistance FROM `ai_pomo`.`store information`, `ai_pomo`.`StoreTypeView` where `store information`.`gName` = `StoreTypeView`.`fStore` order by `GPSDistance` ASC;";
+                        MySQLConnector.executeQuery(index_sel);
+
+                        index_sel = "update `ai_pomo`.`store information`, `ai_pomo`.`StoreTypeView4` set `store information`.`gRank` =" +
+                                " `store information`.`gRank` + 1 + round(`store information`.`gFrequency` /6378.138*2*asin(sqrt(pow(sin(((`store information`.`gY`-" + mLatitude + ")*pi()/180)/2),2)+" +
+                                "cos(`store information`.`gY`*pi()/180)*cos(" + mLatitude + "*pi()/180)* pow(sin(((`store information`.`gX`-" + mLongitude + ")*pi()/180)/2),2)))*10000) where `store information`.`gName` = `StoreTypeView4`.`gName`;";
+                        MySQLConnector.executeQuery(index_sel);
+
+                        index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.StoreDistanceView AS " +
+                                "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency, gRank, GPSDistance from `ai_pomo`.`store information` where round(" + mLatitude + ",1) = round(`gY`, 1) AND round(" + mLongitude + ",2) = round(`gX`, 2) order by `GPSDistance` ASC;";
+                        MySQLConnector.executeQuery(index_sel);
+
+                        index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `GPSDistance` = round(6378.138*2*asin(sqrt(pow(sin(((`gY`-" + mLatitude + ")*pi()/180)/2),2)+" +
+                                "cos(`gY`*pi()/180)*cos(" + mLatitude + "*pi()/180)* pow(sin(((`gX`-" + mLongitude + ")*pi()/180)/2),2)))*1000);";
+                        MySQLConnector.executeQuery(index_sel);
+
+
+                        i++;
+                    }while (mArrayType[i] != null);
+
+                index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView`, `ai_pomo`.`StoreTypeView2` set `GPSDistanceAndStoreTimeView`.`gFrequency` =" +
+                        " 100 where `GPSDistanceAndStoreTimeView`.`gName` = `StoreTypeView2`.`gName`;";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "UPDATE `ai_pomo`.`StoreDistanceView`, `ai_pomo`.`StoreTypeView4` set `StoreDistanceView`.`gFrequency` =" +
+                        " 100 where `StoreDistanceView`.`gName` = `StoreTypeView4`.`gName`;";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "SELECT gId, gName, gOpen, gClose,gX, gY, gFrequency, gRank, GPSDistance from `ai_pomo`.`GPSDistanceAndStoreTimeView` where `gOpen` < " + mTime + " OR `gClose`>" + mTime +
+                        " union " +
+                        "SELECT gId, gName, gOpen, gClose,gX, gY, gFrequency, gRank, GPSDistance from `ai_pomo`.`StoreDistanceView` where `gOpen` < " + mTime + " OR `gClose`>" + mTime + " ORDER BY `gFrequency` DESC,`gRank` DESC, `GPSDistance` ASC;";
                 String result_sumsel = MySQLConnector.executeQuery(index_sel);
+
+
                 Log.d("test",result_sumsel);
 
                 JSONArray jsonArray2 = new JSONArray(result_sumsel);
 
                 setTitle("查詢資料結果");
 
-                for (int i = 0; i < jsonArray2.length(); i++) {
+                for (i = 0; i < jsonArray2.length(); i++) {
                     JSONObject jsonData = jsonArray2.getJSONObject(i);
                     HashMap<String, Object> h2 = new HashMap<String, Object>();
-                    h2.put("gName", jsonData.getString("fStore"));
+                    h2.put("gId", jsonData.getString("gId"));
+                    h2.put("gName", jsonData.getString("gName"));
+                    h2.put("GPSDistance", jsonData.getString("GPSDistance"));
+
 
                     mStoreList.add(h2);
                     count++;
@@ -245,30 +325,83 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
                 Log.d("test","mNumber == 2");
 
                 String index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.GPSDistanceAndStoreTimeView AS " +
-                        "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency,GPSDistance from `ai_pomo`.`gps` WHERE round( " + mLatitude + " ,2) = round(`gY`, 2) AND round(" + mLongitude + ", 2) = round(`gX`, 2);";
+                        "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency, gRank, GPSDistance from `ai_pomo`.`gps` where round(" + mLatitude + ",1) = round(`gY`, 1) AND " +
+                        "round(" + mLongitude + ",2) = round(`gX`, 2) order by `GPSDistance` ASC;";
                 MySQLConnector.executeQuery(index_sel);
 
                 index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.StoreDistanceView AS " +
-                        "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency, GPSDistance from `ai_pomo`.`store information` WHERE round( "+ mLatitude + " ,2) = round(`gY`, 2) AND round(" + mLongitude + ", 2) = round(`gX`, 2);";
+                        "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency, gRank, GPSDistance from `ai_pomo`.`store information` where round(" + mLatitude + ",1) = round(`gY`, 2) AND " +
+                        "round(" + mLongitude + ",2) = round(`gX`, 2);";
                 MySQLConnector.executeQuery(index_sel);
 
-                index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView` set `GPSDistance` = round(6378.138*2*asin(sqrt(pow(sin(((`gY`- " + mLatitude + ")*pi()/180)/2),2)+" +
-                        "cos(`gY`*pi()/180)*cos(" + mLatitude + "*pi()/180)* pow(sin(((`gX`-" + mLongitude + ")*pi()/180)/2),2)))*1000);";
+                index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView` set `GPSDistance` = " +
+                        "round(6378.138*2*asin(sqrt(pow(sin(((`gY`-" + mLatitude + ")*pi()/180)/2),2)+cos(`gY`*pi()/180)*cos(" + mLatitude + "*pi()/180)* pow(sin(((`gX`-" + mLongitude + ")*pi()/180)/2),2)))*1000);";
                 MySQLConnector.executeQuery(index_sel);
 
                 index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView` set `gFrequency` = `gFrequency` /`GPSDistance`;";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `GPSDistance` = " +
+                        "round(6378.138*2*asin(sqrt(pow(sin(((`gY`-" + mLatitude + ")*pi()/180)/2),2)+cos(`gY`*pi()/180)*cos(" + mLatitude + "*pi()/180)* pow(sin(((`gX`-" + mLongitude + ")*pi()/180)/2),2)))*1000);";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `gFrequency` = `gFrequency` /`GPSDistance`;";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.StoreTypeView AS " +
+                        "SELECT * from `ai_pomo`.`food` WHERE `fSort` = '" + mType + "';";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.StoreTypeView2 AS " +
+                        "SELECT DISTINCT gName, gOpen, gClose,gX, gY, gFrequency, gRank, GPSDistance FROM `ai_pomo`.`GPSDistanceAndStoreTimeView`, `ai_pomo`.`StoreTypeView` where SUBSTRING_INDEX(`GPSDistanceAndStoreTimeView`.`gName`, ' ', 1) = " +
+                        "`StoreTypeView`.`fStore` order by `GPSDistance` ASC;";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "update `ai_pomo`.`gps`, `ai_pomo`.`StoreTypeView2` set `gps`.`gRank` =" +
+                        " `gps`.`gRank` + 1 +round(`gps`.`gFrequency`/ 6378.138*2*asin(sqrt(pow(sin(((`gps`.`gY`-" + mLatitude + ")*pi()/180)/2),2)+" +
+                        "cos(`gps`.`gY`*pi()/180)*cos(" + mLatitude + "*pi()/180)* pow(sin(((`gps`.`gX`-" + mLongitude + ")*pi()/180)/2),2)))*10000)where `gps`.`gName` = `StoreTypeView2`.`gName`;";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.GPSDistanceAndStoreTimeView AS " +
+                        "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency, gRank, GPSDistance from `ai_pomo`.`gps` where round(" + mLatitude + ",1) = round(`gY`, 1) AND round(" + mLongitude + ",2) = round(`gX`, 2) order by `GPSDistance` ASC;";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView` set `GPSDistance` = " +
+                        "round(6378.138*2*asin(sqrt(pow(sin(((`gY`-" + mLatitude + ")*pi()/180)/2),2)+cos(`gY`*pi()/180)*cos(" + mLatitude + "*pi()/180)* pow(sin(((`gX`-" + mLongitude + ")*pi()/180)/2),2)))*1000);";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.StoreTypeView3 AS " +
+                        "SELECT * from `ai_pomo`.`store` WHERE `fSort` = '" + mType + "';";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.StoreTypeView4 AS " +
+                        "SELECT DISTINCT gName, gOpen, gClose,gX, gY, gFrequency, gRank, GPSDistance FROM `ai_pomo`.`store information`, `ai_pomo`.`StoreTypeView` where `store information`.`gName` = `StoreTypeView`.`fStore` order by `GPSDistance` ASC;";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "update `ai_pomo`.`store information`, `ai_pomo`.`StoreTypeView4` set `store information`.`gRank` =" +
+                        " `store information`.`gRank` + 1 + round(`store information`.`gFrequency` /6378.138*2*asin(sqrt(pow(sin(((`store information`.`gY`-" + mLatitude + ")*pi()/180)/2),2)+" +
+                        "cos(`store information`.`gY`*pi()/180)*cos(" + mLatitude + "*pi()/180)* pow(sin(((`store information`.`gX`-" + mLongitude + ")*pi()/180)/2),2)))*10000) where `store information`.`gName` = `StoreTypeView4`.`gName`;";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.StoreDistanceView AS " +
+                        "SELECT gId, gName, gX, gY, gOpen, gClose, gFrequency, gRank, GPSDistance from `ai_pomo`.`store information` where round(" + mLatitude + ",1) = round(`gY`, 1) AND round(" + mLongitude + ",2) = round(`gX`, 2) order by `GPSDistance` ASC;";
                 MySQLConnector.executeQuery(index_sel);
 
                 index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `GPSDistance` = round(6378.138*2*asin(sqrt(pow(sin(((`gY`-" + mLatitude + ")*pi()/180)/2),2)+" +
                         "cos(`gY`*pi()/180)*cos(" + mLatitude + "*pi()/180)* pow(sin(((`gX`-" + mLongitude + ")*pi()/180)/2),2)))*1000);";
                 MySQLConnector.executeQuery(index_sel);
 
-                index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `gFrequency` = `gFrequency` /`GPSDistance`;";
+                index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView`, `ai_pomo`.`StoreTypeView2` set `GPSDistanceAndStoreTimeView`.`gFrequency` =" +
+                        " 100 where `GPSDistanceAndStoreTimeView`.`gName` = `StoreTypeView2`.`gName`;";
                 MySQLConnector.executeQuery(index_sel);
 
-                index_sel = "SELECT gId,gName,gOpen, gClose, gFrequency, GPSDistance from `ai_pomo`.`GPSDistanceAndStoreTimeView` where `gOpen` < " + mTime + " OR `gClose`>" + mTime +
+                index_sel = "UPDATE `ai_pomo`.`StoreDistanceView`, `ai_pomo`.`StoreTypeView4` set `StoreDistanceView`.`gFrequency` =" +
+                        " 100 where `StoreDistanceView`.`gName` = `StoreTypeView4`.`gName`;";
+                MySQLConnector.executeQuery(index_sel);
+
+                index_sel = "SELECT gId, gName, gOpen, gClose,gX, gY, gFrequency, gRank, GPSDistance from `ai_pomo`.`GPSDistanceAndStoreTimeView` where `gOpen` < " + mTime + " OR `gClose`>" + mTime +
                         " union " +
-                        "SELECT gId,gName,gOpen, gClose, gFrequency, GPSDistance from `ai_pomo`.`StoreDistanceView` where `gOpen` < " + mTime + " OR `gClose`> " + mTime + " ORDER BY `gFrequency` DESC, `GPSDistance` ASC ;";
+                        "SELECT gId, gName, gOpen, gClose,gX, gY, gFrequency, gRank, GPSDistance from `ai_pomo`.`StoreDistanceView` where `gOpen` < " + mTime + " OR `gClose`>" + mTime + " ORDER BY `gFrequency` DESC,`gRank` DESC, `GPSDistance` ASC;";
                 String result_sumsel = MySQLConnector.executeQuery(index_sel);
 
                 Log.d("test",result_sumsel);
@@ -320,6 +453,7 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
         mLatitude = location.getLatitude();
         mLongitude = location.getLongitude();
 
+        initView();
     }
 
     @Override
@@ -395,7 +529,7 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
             TextView StoreListStoreText = (TextView)convertView.findViewById(R.id.StoreListStoreText);
             StoreListStoreText.setText(mStoreList.get(position).get("gName").toString());
             TextView StoreListDistanceText = (TextView)convertView.findViewById(R.id.StoreListDistanceText);
-            StoreListDistanceText.setText(mStoreList.get(position).get("GPSDistance").toString());
+            StoreListDistanceText.setText(mStoreList.get(position).get("GPSDistance").toString() + "公尺");
 
 
             return convertView;
@@ -411,7 +545,7 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
         LayoutInflater inflater = LayoutInflater.from(this);
         view = inflater.inflate(R.layout.store_data_object, null);
         mStoreName = (TextView)view.findViewById(R.id.storeNameTxt);
-        mStorePic = (ImageView)view.findViewById(R.id.storeImage);
+//        mStorePic = (ImageView)view.findViewById(R.id.storeImage);
         mStoreDataTxt = (TextView)view.findViewById(R.id.storeDataTxt);
         mSearchFoodBtn = (Button)view.findViewById(R.id.SearchFoodBtn);
         mHelpEditBtn = (Button)view.findViewById(R.id.HelpEditBtn);
@@ -454,49 +588,49 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        if(mClickStoreData.get(0).get("Picture").toString().length() > 0) {
-            try {
-                URL url = new URL(mClickStoreData.get(0).get("Picture").toString());
-                URLConnection conn = url.openConnection();
-
-                HttpURLConnection httpConn = (HttpURLConnection) conn;
-                httpConn.setRequestMethod("GET");
-                httpConn.connect();
-
-                if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    InputStream inputStream = httpConn.getInputStream();
-
-                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                    inputStream.close();
-                    mStorePic.setImageBitmap(bitmap);
-                }
-            } catch (MalformedURLException e1) {
-                e1.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }else{
-            try {
-                URL url = new URL("http://203.68.252.55/AndroidConnectDB/DJZ.jpg");
-                URLConnection conn = url.openConnection();
-
-                HttpURLConnection httpConn = (HttpURLConnection) conn;
-                httpConn.setRequestMethod("GET");
-                httpConn.connect();
-
-                if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    InputStream inputStream = httpConn.getInputStream();
-
-                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                    inputStream.close();
-                    mStorePic.setImageBitmap(bitmap);
-                }
-            } catch (MalformedURLException e1) {
-                e1.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+//        if(mClickStoreData.get(0).get("Picture").toString().length() > 0) {
+//            try {
+//                URL url = new URL(mClickStoreData.get(0).get("Picture").toString());
+//                URLConnection conn = url.openConnection();
+//
+//                HttpURLConnection httpConn = (HttpURLConnection) conn;
+//                httpConn.setRequestMethod("GET");
+//                httpConn.connect();
+//
+//                if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+//                    InputStream inputStream = httpConn.getInputStream();
+//
+//                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+//                    inputStream.close();
+//                    mStorePic.setImageBitmap(bitmap);
+//                }
+//            } catch (MalformedURLException e1) {
+//                e1.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }else{
+//            try {
+//                URL url = new URL("http://203.68.252.55/AndroidConnectDB/DJZ.jpg");
+//                URLConnection conn = url.openConnection();
+//
+//                HttpURLConnection httpConn = (HttpURLConnection) conn;
+//                httpConn.setRequestMethod("GET");
+//                httpConn.connect();
+//
+//                if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+//                    InputStream inputStream = httpConn.getInputStream();
+//
+//                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+//                    inputStream.close();
+//                    mStorePic.setImageBitmap(bitmap);
+//                }
+//            } catch (MalformedURLException e1) {
+//                e1.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         String OpenTime = mClickStoreData.get(0).get("gOpen").toString();
 
