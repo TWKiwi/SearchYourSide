@@ -376,7 +376,10 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
                 case R.id.addDataBtn:
                     Toast.makeText(this.getView().getContext(), "儲存", Toast.LENGTH_LONG).show();
                     if (mPicName.equals("null")) mPicName =
-                            new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".jpg";
+                        new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".jpg";
+                    if (mItemPrice.getText().toString().length() == 0 || mItemPrice.getText().toString().equals("0")){
+                        mItemPrice.setText("0");
+                    }
                     mLazyChargeActivity.addDb(mPicName,
                             mItemName.getText().toString(),
                             mItemType.getSelectedItem().toString(),
