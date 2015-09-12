@@ -16,6 +16,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -159,6 +160,8 @@ public class FoodListActivity extends ActionBarActivity {
                             mFoodList.get(position).get("fName").toString() + "';";
 
                     MySQLConnector.executeQuery(index_sel);
+
+                    Toast.makeText(FoodListActivity.this,"已送出",Toast.LENGTH_LONG).show();
                 }
             });
 
