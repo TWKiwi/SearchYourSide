@@ -716,7 +716,6 @@ public class LazyChargeActivity extends FragmentActivity implements ActionBar.Ta
         View BarCharView, mView;
         LazyChargeActivity mLazyChargeActivity = new LazyChargeActivity();
         TextView ScaleNumM, ScaleNumD;
-        Button ScaleBtn;
 
         Long mBudget;
         Long mRglCost;

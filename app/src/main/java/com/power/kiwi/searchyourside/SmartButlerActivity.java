@@ -2,6 +2,7 @@ package com.power.kiwi.searchyourside;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -55,6 +56,7 @@ public class SmartButlerActivity extends ActionBarActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_smart_butler);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);//螢幕保持直立顯示
         mOptionsActivity.optionSpr = getApplication().getSharedPreferences("Option", Context.MODE_PRIVATE);
         /* 實體化View */
         mEditText = (EditText) findViewById(R.id.SearchFoodEdit);

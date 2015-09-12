@@ -1,6 +1,8 @@
 package com.power.kiwi.searchyourside;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -12,9 +14,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class EditStoreDataActivity extends ActionBarActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener {
+
+    OptionsActivity mOptionsActivity = new OptionsActivity();
 
     EditText mNewStoreName,mNewStoreAddress,mNewStoreDescription,mNewStoreRemarkNote;
     Button mStoreEditBtn,mEditCancelBtn;
@@ -27,13 +32,14 @@ public class EditStoreDataActivity extends ActionBarActivity implements View.OnC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_store_data);
-
-        initView();
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);//螢幕保持直立顯示
+        mOptionsActivity.optionSpr = getApplication().getSharedPreferences("Option", Context.MODE_PRIVATE);
+        initEditView();
 
 
     }
 
-    private void initView(){
+    private void initEditView(){
         mNewStoreName = (EditText) findViewById(R.id.newStoreName);
         mNewStoreDescription = (EditText) findViewById(R.id.newStoreDescription);
         mNewStoreAddress = (EditText) findViewById(R.id.newStoreAddress);
@@ -88,16 +94,19 @@ public class EditStoreDataActivity extends ActionBarActivity implements View.OnC
         switch (v.getId()){
             case R.id.StoreEditBtn :
 
+                String memberID = mOptionsActivity.getString("MemberID");
+
                 mOpenTime = mOpenHouseSpn.getSelectedItem().toString() + mOpenMinuteSpn.getSelectedItem().toString();
                 mCloseTime = mCloseHouseSpn.getSelectedItem().toString() + mCloseMinuteSpn.getSelectedItem().toString();
 
-                String index_sel = "INSERT INTO `user_extra`.`changelist` (`Name`, `NewName`, `gX`, `gY`, `gOpen`, `gClose`, `Description`, `Remarknote`) VALUES ('" +
+                String index_sel = "INSERT INTO `user_extra`.`changelist` (`Name`, `NewName`, `gX`, `gY`, `gOpen`, `gClose`, `Description`, `Remarknote`, `Account`) VALUES ('" +
                         mStoreName + "', '" + mNewStoreName + "', '" + mgX + "', '" + mgY + "', '" + mOpenTime + "', '" + mCloseTime + "', '" +
-                        mNewStoreDescription.getText().toString() + "', '" + mNewStoreRemarkNote.getText().toString() + "');";
-
-
+                        mNewStoreDescription.getText().toString() + "', '" + mNewStoreRemarkNote.getText().toString() + "', '" + memberID + "' );";
 
                 MySQLConnector.executeQuery(index_sel);
+
+                Toast.makeText(this,"申請已提交\n我們會盡快審核並更新\n感謝您",Toast.LENGTH_LONG).show();
+                this.finish();
                 break;
             case R.id.EditCancelBtn :
                 this.finish();
