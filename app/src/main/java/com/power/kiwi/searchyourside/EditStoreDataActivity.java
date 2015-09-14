@@ -40,6 +40,8 @@ public class EditStoreDataActivity extends ActionBarActivity implements View.OnC
     }
 
     private void initEditView(){
+        setTitle("提出編輯");
+
         mNewStoreName = (EditText) findViewById(R.id.newStoreName);
         mNewStoreDescription = (EditText) findViewById(R.id.newStoreDescription);
         mNewStoreAddress = (EditText) findViewById(R.id.newStoreAddress);
