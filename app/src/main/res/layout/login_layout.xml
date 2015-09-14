@@ -27,7 +27,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:textSize="22sp"
+            android:textSize="24sp"
             android:text="@string/LoginIDTxt"/>
 
         <EditText
@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="5"
             android:layout_gravity="center"
-            android:textSize="22sp"
+            android:textSize="18sp"
             android:hint="@string/IDEditHint"
             android:id="@+id/MemberIDEdit"
             android:inputType="textEmailAddress"/>
@@ -55,7 +55,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:textSize="22sp"
+            android:textSize="24sp"
             android:text="@string/LoginPWTxt"/>
 
         <EditText
@@ -63,7 +63,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="5"
             android:layout_gravity="center"
-            android:textSize="22sp"
+            android:textSize="18sp"
             android:hint="@string/PWEditHint"
             android:id="@+id/MemberPWEdit"
             android:inputType="textPassword"
@@ -85,6 +85,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/LoginBtn"
+            android:textSize="24sp"
             android:layout_marginLeft="5sp"
             android:layout_marginTop="10sp"
             android:layout_marginBottom="10sp"
@@ -95,6 +96,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/RegisterTxt"
+            android:textSize="24sp"
             android:layout_marginLeft="5sp"
             android:layout_marginRight="5sp"
             android:layout_marginTop="10sp"

@@ -27,7 +27,8 @@
             android:id="@+id/SearchFoodEdit"
             android:background="#FFFFFF"
             android:textColor="#000000"
-            android:singleLine="true"/>
+            android:singleLine="true"
+            android:layout_margin="5sp"/>
 
 
         </TableRow>
