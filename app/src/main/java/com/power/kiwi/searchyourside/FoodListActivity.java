@@ -63,8 +63,10 @@ public class FoodListActivity extends ActionBarActivity {
         getBundle();
 
         setListView();
+
         MyFoodAdapter adapter = new MyFoodAdapter(this);
         mFoodListView.setAdapter(adapter);
+
     }
 
     private void getBundle(){
@@ -73,6 +75,7 @@ public class FoodListActivity extends ActionBarActivity {
         mStoreName = intent.getStringExtra("gName");
         gX = intent.getStringExtra("gX");
         gY = intent.getStringExtra("gY");
+
     }
 
     private ArrayList<HashMap<String, Object>> setListView(){
@@ -107,9 +110,9 @@ public class FoodListActivity extends ActionBarActivity {
             }
             Log.d("test",""+count);
         } catch (JSONException e) {
+            setTitle("尚無資料，前往編輯店家！");
             e.printStackTrace();
         }
-//    }
 
         return mFoodList;
     }
