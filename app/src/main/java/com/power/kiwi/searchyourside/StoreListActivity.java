@@ -85,7 +85,7 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
                 .build());
         //連線
 
-        initView();
+
     }
 
     private void initView(){
@@ -193,9 +193,9 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
                 index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `gFrequency` = `gFrequency` /`GPSDistance`;";
                 MySQLConnector.executeQuery(index_sel);
 
-                index_sel = "SELECT gId,gName,gOpen, gClose, gFrequency, GPSDistance from `ai_pomo`.`GPSDistanceAndStoreTimeView` where `gOpen` < " + mTime + " OR `gClose`>" + mTime +
+                index_sel = "SELECT gId,gName,gOpen, gClose, gFrequency, GPSDistance from `ai_pomo`.`GPSDistanceAndStoreTimeView` where (`gOpen` < " + mTime + " OR `gClose`>" + mTime + ") AND `GPSDistance` < 5000" +
                            " union " +
-                           "SELECT gId,gName,gOpen, gClose, gFrequency, GPSDistance from `ai_pomo`.`StoreDistanceView` where `gOpen` < " + mTime + " OR `gClose`> " + mTime + " ORDER BY `GPSDistance` ASC, `gFrequency` DESC;";
+                           "SELECT gId,gName,gOpen, gClose, gFrequency, GPSDistance from `ai_pomo`.`StoreDistanceView` where (`gOpen` < " + mTime + " OR `gClose`> " + mTime + ") AND `GPSDistance` < 5000 ORDER BY `GPSDistance` ASC, `gFrequency` DESC;";
                 String result_sumsel = MySQLConnector.executeQuery(index_sel);
 
                 Log.d("test",result_sumsel);
@@ -343,14 +343,14 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
                         "round(6378.138*2*asin(sqrt(pow(sin(((`gY`-" + mLatitude + ")*pi()/180)/2),2)+cos(`gY`*pi()/180)*cos(" + mLatitude + "*pi()/180)* pow(sin(((`gX`-" + mLongitude + ")*pi()/180)/2),2)))*1000);";
                 MySQLConnector.executeQuery(index_sel);
 
-                index_sel = "UPDATE `ai_pomo`.`GPSDistanceAndStoreTimeView` set `gFrequency` = `gFrequency` /`GPSDistance`;";
+                index_sel = "UPDATE `ai_pomo`.`gps`, `ai_pomo`.`GPSDistanceAndStoreTimeView` set `gps`.`gRank` = + 1+ `gps`.`gFrequency` /`GPSDistanceAndStoreTimeView`.`GPSDistance` where `gps`.`gId` = `GPSDistanceAndStoreTimeView`.`gID`;";
                 MySQLConnector.executeQuery(index_sel);
 
                 index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `GPSDistance` = " +
                         "round(6378.138*2*asin(sqrt(pow(sin(((`gY`-" + mLatitude + ")*pi()/180)/2),2)+cos(`gY`*pi()/180)*cos(" + mLatitude + "*pi()/180)* pow(sin(((`gX`-" + mLongitude + ")*pi()/180)/2),2)))*1000);";
                 MySQLConnector.executeQuery(index_sel);
 
-                index_sel = "UPDATE `ai_pomo`.`StoreDistanceView` set `gFrequency` = `gFrequency` /`GPSDistance`;";
+                index_sel = "UPDATE  `ai_pomo`.`store information`, `ai_pomo`.`StoreDistanceView` set `store information`.`gRank` = + 1+ `store information`.`gFrequency` /`StoreDistanceView`.`GPSDistance` where `store information`.`gId` = `StoreDistanceView`.`gID`;";
                 MySQLConnector.executeQuery(index_sel);
 
                 index_sel = "CREATE OR REPLACE VIEW `ai_pomo`.StoreTypeView AS " +
@@ -406,7 +406,7 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
 
                 index_sel = "SELECT gId, gName, gOpen, gClose,gX, gY, gFrequency, gRank, GPSDistance from `ai_pomo`.`GPSDistanceAndStoreTimeView` where `gOpen` < " + mTime + " OR `gClose`>" + mTime +
                         " union " +
-                        "SELECT gId, gName, gOpen, gClose,gX, gY, gFrequency, gRank, GPSDistance from `ai_pomo`.`StoreDistanceView` where `gOpen` < " + mTime + " OR `gClose`>" + mTime + " ORDER BY `gFrequency` DESC,`gRank` DESC, `GPSDistance` ASC;";
+                        "SELECT gId, gName, gOpen, gClose,gX, gY, gFrequency, gRank, GPSDistance from `ai_pomo`.`StoreDistanceView` where `gOpen` < " + mTime + " OR `gClose`>" + mTime + " ORDER BY `gRank` DESC, `GPSDistance` ASC , `gFrequency` DESC";
                 String result_sumsel = MySQLConnector.executeQuery(index_sel);
 
                 Log.d("test",result_sumsel);
@@ -458,7 +458,7 @@ public class StoreListActivity extends ActionBarActivity implements LocationList
         mLatitude = location.getLatitude();
         mLongitude = location.getLongitude();
 
-
+        initView();
     }
 
     @Override
