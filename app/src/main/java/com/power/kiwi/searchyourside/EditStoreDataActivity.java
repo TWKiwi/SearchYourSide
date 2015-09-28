@@ -101,9 +101,9 @@ public class EditStoreDataActivity extends ActionBarActivity implements View.OnC
                 mOpenTime = mOpenHouseSpn.getSelectedItem().toString() + mOpenMinuteSpn.getSelectedItem().toString();
                 mCloseTime = mCloseHouseSpn.getSelectedItem().toString() + mCloseMinuteSpn.getSelectedItem().toString();
 
-                String index_sel = "INSERT INTO `user_extra`.`changelist` (`Name`, `NewName`, `gX`, `gY`, `gOpen`, `gClose`, `Description`, `Remarknote`, `Account`) VALUES ('" +
-                        mStoreName + "', '" + mNewStoreName + "', '" + mgX + "', '" + mgY + "', '" + mOpenTime + "', '" + mCloseTime + "', '" +
-                        mNewStoreDescription.getText().toString() + "', '" + mNewStoreRemarkNote.getText().toString() + "', '" + memberID + "' );";
+                String index_sel = "INSERT INTO `user_extra`.`changelist` (`Name`, `NewName`, `gX`, `gY`, `gOpen`, `gClose`, `Description`, `Remarknote`, `Account`, `Address`) VALUES ('" +
+                        mStoreName + "', '" + mNewStoreName.getText().toString().trim() + "', '" + mgX + "', '" + mgY + "', '" + mOpenTime + "', '" + mCloseTime + "', '" +
+                        mNewStoreDescription.getText().toString() + "', '" + mNewStoreRemarkNote.getText().toString() + "', '" + memberID + "','" + mNewStoreAddress.getText().toString()  + "');";
 
                 MySQLConnector.executeQuery(index_sel);
 
